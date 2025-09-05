@@ -37,8 +37,8 @@ public class HikCamera : ICamera
 
     #region 相机属性
     // 相机特有属性
-    private IDevice device = null;
-    private static readonly Dictionary<string, IDevice> _devices = new();
+    private IDevice device;
+    private static readonly Dictionary<string, IDevice> devices = new();
     /// <summary>
     /// ch: 断线重连线程 | en: Reconnect thread
     /// </summary>
@@ -56,22 +56,22 @@ public class HikCamera : ICamera
     /// <summary>
     /// ch: 异步处理线程 | asynchronous processing thread
     /// </summary>
-    private Thread _asyncProcessThread = null;
+    private Thread _asyncProcessThread;
     /// <summary>
     /// ch: 信号，通知异步处理线程处理 | Used to notify the processing thread
     /// </summary>
-    private Semaphore _frameGrabSem = null;
+    private Semaphore _frameGrabSem;
     /// <summary>
     /// ch: 异步处理线程退出标志 | en: Flag to notify the  processing thread to exit
     /// </summary>
-    private volatile bool _processThreadExit = false;
+    private volatile bool _processThreadExit;
     #endregion
 
     #region 构造函数
     public HikCamera(string sn)
     {
         SN = sn ?? throw new ArgumentNullException(nameof(sn));
-        device = _devices[SN];
+        device = devices[SN];
     }
     #endregion
 
@@ -89,20 +89,21 @@ public class HikCamera : ICamera
         {
             // ch:创建设备 | en:Create device
             IDevice dev = DeviceFactory.CreateDevice(devInfo);
-            _devices.TryAdd(devInfo.SerialNumber, dev);
+            if (!devices.ContainsKey(devInfo.SerialNumber))
+                devices.Add(devInfo.SerialNumber, dev);
         }
-        return _devices.Keys.ToList();
+        return devices.Keys.ToList();
     }
     #endregion
 
     #region 实现ICamera接口的方法
 
     // 图像回调事件（需显式实现事件添加/移除逻辑，确保线程安全）
-    private event EventHandler<Bitmap> _frameGrabedEvent;
+    private event EventHandler<Bitmap> frameGrabedEvent;
     public event EventHandler<Bitmap> FrameGrabedEvent
     {
-        add => _frameGrabedEvent += value;
-        remove => _frameGrabedEvent -= value;
+        add => frameGrabedEvent += value;
+        remove => frameGrabedEvent -= value;
     }
     public int Open()
     {
@@ -121,8 +122,7 @@ public class HikCamera : ICamera
                 IGigEDevice gigEDevice = device as IGigEDevice;
 
                 // ch:探测网络最佳包大小(只对GigE相机有效) | en:Detection network optimal package size(It only works for the GigE camera)
-                int optionPacketSize;
-                ret = gigEDevice.GetOptimalPacketSize(out optionPacketSize);
+                ret = gigEDevice.GetOptimalPacketSize(out var optionPacketSize);
                 if (ret != MvError.MV_OK)
                 {
                     Console.WriteLine("Warning: Get Packet Size failed!");
@@ -224,25 +224,13 @@ public class HikCamera : ICamera
 
     public void SetSoftwareTrigger()
     {
-        try
-        {
-            device.Parameters.SetEnumValue("TriggerMode", 1);
-            device.Parameters.SetEnumValueByString("TriggerSource", "Software");
-        }
-        catch (Exception e)
-        {
-        }
+        device.Parameters.SetEnumValue("TriggerMode", 1);
+        device.Parameters.SetEnumValueByString("TriggerSource", "Software");
     }
     public void SetTriggerSource(string triggerSource)
     {
-        try
-        {
-            device.Parameters.SetEnumValue("TriggerMode", 1);
-            device.Parameters.SetEnumValueByString("TriggerSource", triggerSource);
-        }
-        catch (Exception e)
-        {
-        }
+        device.Parameters.SetEnumValue("TriggerMode", 1);
+        device.Parameters.SetEnumValueByString("TriggerSource", triggerSource);
     }
 
     public IStringVal GetTriggerSource()
@@ -426,22 +414,12 @@ public class HikCamera : ICamera
                     if (dstPixelType == MvGvspPixelType.PixelType_Gvsp_Mono8)
                     {
                         using var bitmap = outImage.ToBitmap();
-                        if (OperatingSystem.IsWindows())
-                        {
-#pragma warning disable CA1416
-                            _frameGrabedEvent?.Invoke(this, bitmap);
-#pragma warning restore CA1416
-                        }
+                        frameGrabedEvent?.Invoke(this, bitmap);
                     }
                     else
                     {
                         using var bitmap = outImage.ToBitmap();
-                        if (OperatingSystem.IsWindows())
-                        {
-#pragma warning disable CA1416
-                            _frameGrabedEvent?.Invoke(this, bitmap);
-#pragma warning restore CA1416
-                        }
+                        frameGrabedEvent?.Invoke(this, bitmap);
                     }
 
                     outImage.Dispose();

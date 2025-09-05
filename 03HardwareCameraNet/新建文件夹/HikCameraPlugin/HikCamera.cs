@@ -4,6 +4,7 @@ using System.Drawing;
 using System.Linq;
 using System.Threading;
 using HardwareCameraNet;
+using HardwareCameraNet.IValue;
 using MvCameraControl;
 
 namespace HikCameraPlugin;
@@ -74,7 +75,7 @@ public class HikCamera : ICamera
     }
     #endregion
 
-    #region 静态方法
+    #region 静态枚举方法
     public static List<string> EnumerateDevices()
     {
         // ch:枚举设备 | en:Enum device
@@ -88,7 +89,7 @@ public class HikCamera : ICamera
         {
             // ch:创建设备 | en:Create device
             IDevice dev = DeviceFactory.CreateDevice(devInfo);
-            _devices.Add(devInfo.SerialNumber, dev);
+            _devices.TryAdd(devInfo.SerialNumber, dev);
         }
         return _devices.Keys.ToList();
     }
@@ -170,34 +171,17 @@ public class HikCamera : ICamera
         }
     }
 
-    public double GetExposureTime()
+    public IFloatVal GetExposureTime()
     {
-        try
-        {
-            if (device.Parameters.GetFloatValue("ExposureTime", out var val) == MvError.MV_OK)
-                return Convert.ToDouble(val.CurValue);
-        }
-        catch (Exception)
-        {
-            // ignored
-        }
+        if (device.Parameters.GetFloatValue("ExposureTime", out var val) != MvError.MV_OK) return null;
+ 
+        var floatVal = new FloatValImpl(
+            curValue: Convert.ToDouble(val.CurValue),
+            max: Convert.ToDouble(val.Max),
+            min: Convert.ToDouble(val.Min)
+        );
 
-        return 0.0;
-    }
-
-    public double GetMaxExposureTime()
-    {
-        try
-        {
-            if (device.Parameters.GetFloatValue("ExposureTime", out var val) == MvError.MV_OK)
-                return Convert.ToDouble(val.Max);
-        }
-        catch (Exception)
-        {
-            // ignored
-        }
-
-        return 0.0;
+        return floatVal;
     }
 
     public void SetExposureTime(double val)
@@ -213,36 +197,18 @@ public class HikCamera : ICamera
         }
     }
 
-    public double GetGain()
+    public IFloatVal GetGain()
     {
-        try
-        {
-            if (device.Parameters.GetFloatValue("Gain", out var val) == MvError.MV_OK)
-                return Convert.ToDouble(val.CurValue);
-        }
-        catch (Exception)
-        {
-            // ignored
-        }
+        if (device.Parameters.GetFloatValue("Gain", out var val) != MvError.MV_OK) return null;
+        
+        var floatVal = new FloatValImpl(
+            curValue: Convert.ToDouble(val.CurValue),
+            max: Convert.ToDouble(val.Max),
+            min: Convert.ToDouble(val.Min)
+        );
 
-        return 0.0;
+        return floatVal;
     }
-
-    public double GetMaxGain()
-    {
-        try
-        {
-            if (device.Parameters.GetFloatValue("Gain", out var val) == MvError.MV_OK)
-                return Convert.ToDouble(val.Max);
-        }
-        catch (Exception)
-        {
-            // ignored
-        }
-
-        return 0.0;
-    }
-
     public void SetGain(double val)
     {
         try
@@ -267,7 +233,7 @@ public class HikCamera : ICamera
         {
         }
     }
-    public void SetHardwareTrigger(string triggerSource)
+    public void SetTriggerSource(string triggerSource)
     {
         try
         {
@@ -278,6 +244,24 @@ public class HikCamera : ICamera
         {
         }
     }
+
+    public IStringVal GetTriggerSource()
+    {
+        if (device.Parameters.GetEnumValue("TriggerSource", out var val) == MvError.MV_OK) return null;
+
+        List<string> se = [];
+        foreach (var item in val.SupportEnumEntries)
+        {
+            se.Add(item.Symbolic);
+        }
+        var stringval = new StringValImpl(
+            curEnumEntry: val.CurEnumEntry.Symbolic,
+            supportEnumEntries: se
+        );
+
+        return stringval;
+    }
+
     public void SoftwareTriggerOnce()
     {
         SetSoftwareTrigger();
@@ -314,26 +298,32 @@ public class HikCamera : ICamera
         return 0;
     }
 
+    public void DisConnet()
+    {
+        StopThread();
+        StopGrabbing();
+        // ch:关闭设备 | en:Close device
+        if (device == null) return;
+        int ret = device.Close();
+        if (ret != MvError.MV_OK)
+        {
+            Console.WriteLine("Close device failed:{0:x8}", ret);
+        }
+    }
+
     public void Close()
     {
-        try
+        StopThread();
+        StopGrabbing();
+        // ch:关闭设备 | en:Close device
+        if (device == null) return;
+        int ret = device.Close();
+        if (ret != MvError.MV_OK)
         {
-            StopThread();
-            StopGrabbing();
-            // ch:关闭设备 | en:Close device
-            if (device == null) return;
-            int ret = device.Close();
-            if (ret != MvError.MV_OK)
-            {
-                Console.WriteLine("Close device failed:{0:x8}", ret);
-            }
-            device.Dispose();
-            device = null;
+            Console.WriteLine("Close device failed:{0:x8}", ret);
         }
-        catch (Exception e)
-        {
-            // ignored
-        }
+        device.Dispose();
+        device = null;
     }
 
     //public CameraConfig GetConfig()

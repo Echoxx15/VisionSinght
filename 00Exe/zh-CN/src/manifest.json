@@ -1,0 +1,12 @@
+{
+  "metadata": {
+    "netFramework": {
+      "entryPath": "Framework"
+    },
+    "netCore": {
+      "entryPath": "NetCore",
+      "targetFramework": "net8.0"
+    }
+  },
+  "version": 2
+}

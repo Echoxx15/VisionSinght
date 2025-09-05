@@ -1,3 +1,4 @@
+using HardwareCameraNet.IValue;
 using System;
 using System.Drawing;
 using VisionCore.PluginBase;
@@ -35,12 +36,7 @@ public interface ICamera : IPlugin,IDisposable
     /// <summary>
     /// 获取曝光时间
     /// </summary>
-    double GetExposureTime();
-    /// <summary>
-    /// 获取最大曝光时间
-    /// </summary>
-    /// <returns></returns>
-    double GetMaxExposureTime();
+     IFloatVal GetExposureTime();
     /// <summary>
     /// 设置曝光时间
     /// </summary>
@@ -50,12 +46,7 @@ public interface ICamera : IPlugin,IDisposable
     /// 获取增益
     /// </summary>
     /// <returns></returns>
-    double GetGain();
-    /// <summary>
-    /// 获取最大增益
-    /// </summary>
-    /// <returns></returns>
-    double GetMaxGain();
+    IFloatVal GetGain();
     /// <summary>
     /// 设置增益
     /// </summary>
@@ -70,7 +61,12 @@ public interface ICamera : IPlugin,IDisposable
     /// 设置硬件触发模式
     /// </summary>
     /// <returns></returns>
-    void SetHardwareTrigger(string triggerSource);
+    void SetTriggerSource(string triggerSource);
+    /// <summary>
+    /// 获取触发源
+    /// </summary>
+    /// <returns></returns>
+    IStringVal GetTriggerSource();
     /// <summary>
     /// 软触发一次
     /// </summary>
@@ -90,6 +86,10 @@ public interface ICamera : IPlugin,IDisposable
     /// </summary>
     /// <returns></returns>
     int StopGrabbing();
+    /// <summary>
+    /// 断开相机
+    /// </summary>
+    void DisConnet();
     /// <summary>
     /// 关闭相机
     /// </summary>

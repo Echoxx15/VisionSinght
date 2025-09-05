@@ -1,6 +1,6 @@
-using HardwareCameraNet.IValue;
 using System;
 using System.Drawing;
+using HardwareCameraNet.IValue;
 using VisionCore.PluginBase;
 
 namespace HardwareCameraNet;

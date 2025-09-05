@@ -12,7 +12,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\..\..\01MainForm\VisionCore\VisionCore.csproj" />
+    <ProjectReference Include="..\..\01MainForm\VisionCore\VisionCore.csproj" />
   </ItemGroup>
 
 </Project>

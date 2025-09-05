@@ -109,7 +109,10 @@ public sealed class CameraManager
             MethodInfo enumerateMethod = type.GetMethod(
                 name: "EnumerateDevices",
                 bindingAttr: BindingFlags.Public | BindingFlags.Static,
-                types: Type.EmptyTypes);
+                binder: null,  // 补充binder参数（可设为null）
+                types: Type.EmptyTypes,
+                modifiers: null  // 补充modifiers参数（可设为null）
+            );
 
             if (enumerateMethod == null || enumerateMethod.ReturnType != typeof(List<string>))
             {
@@ -270,19 +273,17 @@ public sealed class CameraManager
 
         lock (_lockObj)
         {
-            if (_userCameraConfigs.TryAdd(config.SerialNumber, config))
+            if (!_userCameraConfigs.ContainsKey(config.SerialNumber))
             {
+                _userCameraConfigs.Add(config.SerialNumber, config);
                 // 实时保存到本地
                 SaveUserConfigsToLocal();
                 Console.WriteLine($"添加相机配置：{config.SerialNumber}");
                 return true;
             }
-            else
-            {
-                Console.WriteLine($"序列号{config.SerialNumber}已添加");
-                return false;
-            }
 
+            Console.WriteLine($"序列号{config.SerialNumber}已添加");
+            return false;
         }
     }
 

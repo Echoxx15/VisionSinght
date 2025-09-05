@@ -1,15 +1,14 @@
 ﻿using System;
 using System.Drawing;
 using System.Windows.Forms;
-using Cognex.VisionPro.Display;
 using HardwareCameraNet;
 using HardwareCameraNet.IValue;
 
 namespace MainForm.Forms;
 
-public sealed partial class Frm_Camera2D : Form
+public partial class Frm_Camera2D : DevExpress.XtraEditors.XtraForm
 {
-    private CogDisplay user_ShowDisplay;
+    //private CogDisplay user_ShowDisplay;
 
     // 维护当前选中的相机实例，用于切换时取消订阅以防重复订阅
     private ICamera currentSelectedCamera;
@@ -25,21 +24,20 @@ public sealed partial class Frm_Camera2D : Form
     private void Frm_Camera2D_Load(object sender, EventArgs e)
     {
         cmb_Manufacturers.Properties.Items.AddRange(CameraManager.Instance.GetAllManufacturers());
-        user_ShowDisplay = new CogDisplay();
-        user_ShowDisplay.Dock = DockStyle.Fill;
-        split_Display.Panel2.Controls.Add(user_ShowDisplay);
-        Update();
+        //user_ShowDisplay = new CogDisplay();
+        //user_ShowDisplay.Dock = DockStyle.Fill;
+        //split_Display.Panel2.Controls.Add(user_ShowDisplay);
     }
 
     private void SetControlState(bool flag = false)
     {
-        chk_Hard.Checked = currentSelectedCamera.GetTriggerSource().CurEnumEntry != "Software";
+        chk_HardTrigger.Checked = currentSelectedCamera.GetTriggerSource().CurEnumEntry != "Software";
         chk_Hard_CheckedChanged(null, null);
         if (flag)
         {
             txt_Exposure.Enabled = true;
             txt_Gain.Enabled = true;
-            chk_Hard.Enabled = true;
+            chk_HardTrigger.Enabled = true;
 
             btn_Connect.Enabled = false;
             btn_TriggerOnce.Enabled = true;
@@ -50,7 +48,7 @@ public sealed partial class Frm_Camera2D : Form
         {
             txt_Exposure.Enabled = false;
             txt_Gain.Enabled = false;
-            chk_Hard.Enabled = false;
+            chk_HardTrigger.Enabled = false;
 
             btn_Connect.Enabled = true;
             btn_TriggerOnce.Enabled = false;
@@ -62,7 +60,7 @@ public sealed partial class Frm_Camera2D : Form
     {
         try
         {
-            //if (currentSelectedCamera.IsConnected) return;
+            if (currentSelectedCamera.IsConnected) return;
 
             Exposure = currentSelectedCamera.GetExposureTime();
             Gain = currentSelectedCamera.GetGain();
@@ -143,11 +141,11 @@ public sealed partial class Frm_Camera2D : Form
         }
     }
 
-    private void UpdateUIImage(object sender,Bitmap bmp)
+    private void UpdateUIImage(object sender, Bitmap bmp)
     {
         if (user_ShowDisplay.InvokeRequired)
         {
-            user_ShowDisplay.BeginInvoke(new Action<object,Bitmap>(UpdateUIImage), bmp);
+            user_ShowDisplay.BeginInvoke(new Action<object, Bitmap>(UpdateUIImage), bmp);
         }
         else
         {
@@ -194,16 +192,13 @@ public sealed partial class Frm_Camera2D : Form
     private void chk_Hard_CheckedChanged(object sender, EventArgs e)
     {
         cmb_TriggerSource.SelectedIndex = 0;
-        cmb_TriggerSource.Visible = chk_Hard.Checked;
+        cmb_TriggerSource.Visible = chk_HardTrigger.Checked;
     }
-    private void cmb_HardSource_SelectedIndexChanged(object sender, EventArgs e)
-    {
-        SetHardTrigger();
-    }
-    private void SetHardTrigger()
+    private void cmb_TriggerSource_SelectedIndexChanged(object sender, EventArgs e)
     {
         currentSelectedCamera.SetTriggerSource(cmb_TriggerSource.Text);
     }
+
     private void btn_Connect_Click(object sender, EventArgs e)
     {
         int errCode = 0;
@@ -234,8 +229,7 @@ public sealed partial class Frm_Camera2D : Form
     {
         currentSelectedCamera.SoftwareTriggerOnce();
     }
-
-    private void btn_Continue_Click(object sender, EventArgs e)
+    private void btn_Continuous_Click(object sender, EventArgs e)
     {
         if (btn_Continuous.Text == "连续采集")
         {
@@ -257,4 +251,3 @@ public sealed partial class Frm_Camera2D : Form
         cmb_SnList.Properties.Items.AddRange(list);
     }
 }
-

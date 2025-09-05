@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
@@ -24,7 +25,11 @@ public sealed class CameraManager
     /// <summary>
     /// 已添加的相机列表
     /// </summary>
-    private static readonly List<ICamera> gCameraList = new();
+    private readonly ConcurrentDictionary<string,ICamera> gCameraList = new();
+    /// <summary>
+    /// 枚举创建的相机列表
+    /// </summary>
+    private readonly ConcurrentDictionary<string, ICamera> temCameraList = new();
     /// <summary>
     /// 已添加的相机配置
     /// </summary>
@@ -205,8 +210,21 @@ public sealed class CameraManager
             return null;
         }
 
+        // 先检查缓存：存在则直接返回（避免重复创建）
+        if (temCameraList.TryGetValue(serialNumber, out var cachedCamera))
+        {
+            Console.WriteLine($"复用缓存的相机实例：{serialNumber}");
+            return cachedCamera;
+        }
+
         lock (_lockObj)
         {
+            // 双重检查锁定（DCL）：防止多线程下同时创建同一实例
+            if (temCameraList.TryGetValue(serialNumber, out cachedCamera))
+            {
+                return cachedCamera;
+            }
+
             // 1. 检查厂商是否支持
             if (!ManufacturerMap.TryGetValue(manufacturerName, out var item))
             {
@@ -221,11 +239,21 @@ public sealed class CameraManager
                 Console.WriteLine($"厂商{manufacturerName}下无序列号{serialNumber}的设备");
                 return null;
             }
+            if(temCameraList.TryGetValue(serialNumber, out var cam))
+            {
+                return cam;
+            }
 
             // 3. 创建实例（用插件类型完全限定名）
             var pluginTypeName = item.PluginType.FullName;
-            ICamera camera = _cameraPluginLoader.CreatePluginInstance(pluginTypeName, serialNumber);
-            return camera;
+            ICamera newCamera = _cameraPluginLoader.CreatePluginInstance(pluginTypeName, serialNumber);
+            if (newCamera != null)
+            {
+                // 添加到线程安全缓存
+                temCameraList.TryAdd(serialNumber, newCamera);
+                Console.WriteLine($"创建新相机实例并缓存：{serialNumber}");
+            }
+            return newCamera;
         }
     }
 

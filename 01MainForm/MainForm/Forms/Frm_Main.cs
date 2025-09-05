@@ -1,22 +1,16 @@
-﻿using DevExpress.XtraEditors;
-using System;
-
-namespace MainForm.Forms
+﻿namespace MainForm.Forms
 {
-  public partial class Frm_Main : XtraForm
-  {
-    public Frm_Main()
+    public partial class Frm_Main : DevExpress.XtraEditors.XtraForm
     {
-      InitializeComponent();
-    }
-    private void Frm_Main_Load(object sender, EventArgs e)
-    {
+        public Frm_Main()
+        {
+            InitializeComponent();
+        }
 
+        private void btn_HardwareCamera_ItemClick(object sender, DevExpress.XtraBars.ItemClickEventArgs e)
+        {
+            var frm = new Frm_Camera2D();
+            frm.Show();
+        }
     }
-    private void btn_HardwareCamera_ItemClick(object sender, DevExpress.XtraBars.ItemClickEventArgs e)
-    {
-      var frm = new Frm_Camera2D();
-      frm.Show();
-    }
-  }
 }
