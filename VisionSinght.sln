@@ -1,0 +1,68 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 17
+VisualStudioVersion = 17.13.35913.81
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "02Plugins", "02Plugins", "{02EA681E-C7D8-13C7-8484-4AC65E1B71E8}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "01MainForm", "01MainForm", "{691D1FB4-AA47-46D4-87F4-38A7D4B70660}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "VisionCore", "VisionCore", "{EA2FA41E-A60E-4A44-B68F-F20832CCA85E}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "03HardwareCameraNet", "03HardwareCameraNet", "{7052A41D-7311-4351-BEB3-BABD0ECA81E2}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "MainForm", "MainForm", "{D6D31331-7BBA-42E2-8167-81B994E35072}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Logger", "01MainForm\Logger\Logger.csproj", "{21C53DB6-0F97-41FD-B939-FB37AD9FA8BF}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "VisionCore", "01MainForm\VisionCore\VisionCore.csproj", "{C1EC5193-9AE2-486B-A80F-E0CABC76993E}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CameraInterface", "03HardwareCameraNet\CameraInterface\CameraInterface.csproj", "{8BA421C9-F283-1D50-7718-1CDC8517B5CE}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "HikCameraPlugin", "03HardwareCameraNet\HikCameraPlugin\HikCameraPlugin.csproj", "{EA9E78FB-F9E7-57A9-3C58-225E72D8F0DB}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MainForm", "01MainForm\MainForm\MainForm.csproj", "{B4BE511A-0714-4B8D-94F7-F3B672509F2B}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{21C53DB6-0F97-41FD-B939-FB37AD9FA8BF}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{21C53DB6-0F97-41FD-B939-FB37AD9FA8BF}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{21C53DB6-0F97-41FD-B939-FB37AD9FA8BF}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{21C53DB6-0F97-41FD-B939-FB37AD9FA8BF}.Release|Any CPU.Build.0 = Release|Any CPU
+		{C1EC5193-9AE2-486B-A80F-E0CABC76993E}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{C1EC5193-9AE2-486B-A80F-E0CABC76993E}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{C1EC5193-9AE2-486B-A80F-E0CABC76993E}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{C1EC5193-9AE2-486B-A80F-E0CABC76993E}.Release|Any CPU.Build.0 = Release|Any CPU
+		{8BA421C9-F283-1D50-7718-1CDC8517B5CE}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{8BA421C9-F283-1D50-7718-1CDC8517B5CE}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{8BA421C9-F283-1D50-7718-1CDC8517B5CE}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{8BA421C9-F283-1D50-7718-1CDC8517B5CE}.Release|Any CPU.Build.0 = Release|Any CPU
+		{EA9E78FB-F9E7-57A9-3C58-225E72D8F0DB}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{EA9E78FB-F9E7-57A9-3C58-225E72D8F0DB}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{EA9E78FB-F9E7-57A9-3C58-225E72D8F0DB}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{EA9E78FB-F9E7-57A9-3C58-225E72D8F0DB}.Release|Any CPU.Build.0 = Release|Any CPU
+		{B4BE511A-0714-4B8D-94F7-F3B672509F2B}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{B4BE511A-0714-4B8D-94F7-F3B672509F2B}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{B4BE511A-0714-4B8D-94F7-F3B672509F2B}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{B4BE511A-0714-4B8D-94F7-F3B672509F2B}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(NestedProjects) = preSolution
+		{EA2FA41E-A60E-4A44-B68F-F20832CCA85E} = {691D1FB4-AA47-46D4-87F4-38A7D4B70660}
+		{D6D31331-7BBA-42E2-8167-81B994E35072} = {691D1FB4-AA47-46D4-87F4-38A7D4B70660}
+		{21C53DB6-0F97-41FD-B939-FB37AD9FA8BF} = {D6D31331-7BBA-42E2-8167-81B994E35072}
+		{C1EC5193-9AE2-486B-A80F-E0CABC76993E} = {EA2FA41E-A60E-4A44-B68F-F20832CCA85E}
+		{8BA421C9-F283-1D50-7718-1CDC8517B5CE} = {7052A41D-7311-4351-BEB3-BABD0ECA81E2}
+		{EA9E78FB-F9E7-57A9-3C58-225E72D8F0DB} = {7052A41D-7311-4351-BEB3-BABD0ECA81E2}
+		{B4BE511A-0714-4B8D-94F7-F3B672509F2B} = {D6D31331-7BBA-42E2-8167-81B994E35072}
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {1CD0725C-F43F-404E-B58F-4C4BA319D6FB}
+	EndGlobalSection
+EndGlobal
