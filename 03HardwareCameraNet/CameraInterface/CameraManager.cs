@@ -288,6 +288,49 @@ public sealed class CameraManager
     }
 
     /// <summary>
+    /// 通过厂商名称和序列号添加/更新相机配置（自动关联插件信息）
+    /// </summary>
+    public bool AddOrUpdateCameraConfig(string manufacturerName, string serialNumber)
+    {
+        if (string.IsNullOrEmpty(manufacturerName) || string.IsNullOrEmpty(serialNumber))
+        {
+            Console.WriteLine("厂商名称和序列号不能为空");
+            return false;
+        }
+
+        lock (_lockObj)
+        {
+            // 检查是否已存在配置
+            if (_userCameraConfigs.ContainsKey(serialNumber))
+            {
+                Console.WriteLine($"序列号{serialNumber}已添加");
+                return false;
+            }
+
+            // 从厂商映射中获取插件类型信息
+            if (!ManufacturerMap.TryGetValue(manufacturerName, out var manufacturerInfo))
+            {
+                Console.WriteLine($"未找到厂商{manufacturerName}的插件信息");
+                return false;
+            }
+
+            // 自动构造CameraConfig（插件类型全名和程序集名从插件类型中获取）
+            var pluginType = manufacturerInfo.PluginType;
+            var config = new CameraConfig(
+                serialNumber,
+                pluginType.FullName,       // 插件类型全名（命名空间+类名）
+                pluginType.Assembly.GetName().Name  // 插件程序集名称
+            );
+
+            // 添加配置并保存
+            _userCameraConfigs.Add(serialNumber, config);
+            SaveUserConfigsToLocal();
+            Console.WriteLine($"添加相机配置：{serialNumber}（厂商：{manufacturerName}）");
+            return true;
+        }
+    }
+
+    /// <summary>
     /// 删除相机配置（自动同步本地）
     /// </summary>
     public bool RemoveCameraConfig(string serialNumber)

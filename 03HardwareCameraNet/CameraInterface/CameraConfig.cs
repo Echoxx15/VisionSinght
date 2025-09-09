@@ -13,7 +13,11 @@ public class CameraConfig
     /// </summary>
     [XmlElement("SerialNumber")]
     public string SerialNumber { get; set; }
-
+    /// <summary>
+    /// 备注
+    /// </summary>
+    [XmlElement("Expain")]
+    public string Expain { get; set; }
     /// <summary>
     /// 插件类型全名（命名空间+类名）
     /// </summary>

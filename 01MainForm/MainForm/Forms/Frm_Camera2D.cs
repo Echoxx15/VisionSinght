@@ -27,6 +27,7 @@ public partial class Frm_Camera2D : DevExpress.XtraEditors.XtraForm
     private void Frm_Camera2D_Load(object sender, EventArgs e)
     {
         cmb_Manufacturers.Properties.Items.AddRange(CameraManager.Instance.GetAllManufacturers());
+        dgv_CameraConfig
         SetControlState();
     }
 
@@ -230,7 +231,23 @@ public partial class Frm_Camera2D : DevExpress.XtraEditors.XtraForm
     }
     private void btn_Add_Click(object sender, EventArgs e)
     {
-        //CameraManager.Instance.AddOrUpdateCameraConfig(new CameraConfig(currentSelectedCamera.SN,currentSelectedCamera.);
+        var selectedManufacturer = cmb_Manufacturers.Text;
+        var selectedSerial = cmb_SnList.SelectedText.Trim();
+        if (string.IsNullOrEmpty(selectedManufacturer) || string.IsNullOrEmpty(selectedSerial))
+        {
+            MessageBox.Show("请选择厂商和序列号");
+            return;
+        }
+
+        CameraManager.Instance.AddOrUpdateCameraConfig(selectedManufacturer, selectedSerial);
+        //if (success)
+        //{
+        //    MessageBox.Show($"相机{selectedSerial}已添加到配置");
+        //}
+        //else
+        //{
+        //    MessageBox.Show("添加失败，可能是重复添加或厂商不支持");
+        //}
     }
 
     private void btn_Remove_Click(object sender, EventArgs e)
@@ -256,7 +273,7 @@ public partial class Frm_Camera2D : DevExpress.XtraEditors.XtraForm
         {
             currentSelectedCamera.DisConnet();
             SetControlState(currentSelectedCamera.IsConnected);
-            //currentSelectedCamera.DisConnetEvent -= DisConnectEvent;
+            currentSelectedCamera.DisConnetEvent -= DisConnectEvent;
         }
         catch (Exception exception)
         {
