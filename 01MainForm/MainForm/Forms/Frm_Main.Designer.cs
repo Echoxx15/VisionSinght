@@ -30,8 +30,8 @@
         {
             this.components = new System.ComponentModel.Container();
             System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(Frm_Main));
-            DevExpress.Utils.SuperToolTip superToolTip2 = new DevExpress.Utils.SuperToolTip();
-            DevExpress.Utils.ToolTipItem toolTipItem2 = new DevExpress.Utils.ToolTipItem();
+            DevExpress.Utils.SuperToolTip superToolTip1 = new DevExpress.Utils.SuperToolTip();
+            DevExpress.Utils.ToolTipItem toolTipItem1 = new DevExpress.Utils.ToolTipItem();
             this.dev_MainBarManager = new DevExpress.XtraBars.BarManager(this.components);
             this.dx_ToolBar = new DevExpress.XtraBars.Bar();
             this.dev_MainStatusBar = new DevExpress.XtraBars.Bar();
@@ -156,9 +156,9 @@
             this.btn_Login.ImageOptions.SvgImage = ((DevExpress.Utils.Svg.SvgImage)(resources.GetObject("btn_Login.ImageOptions.SvgImage")));
             this.btn_Login.Name = "btn_Login";
             this.btn_Login.PaintStyle = DevExpress.XtraBars.BarItemPaintStyle.CaptionGlyph;
-            toolTipItem2.Text = "登录";
-            superToolTip2.Items.Add(toolTipItem2);
-            this.btn_Login.SuperTip = superToolTip2;
+            toolTipItem1.Text = "登录";
+            superToolTip1.Items.Add(toolTipItem1);
+            this.btn_Login.SuperTip = superToolTip1;
             // 
             // btn_View
             // 

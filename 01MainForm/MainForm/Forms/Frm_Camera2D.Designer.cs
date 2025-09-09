@@ -29,9 +29,11 @@
         private void InitializeComponent()
         {
             this.components = new System.ComponentModel.Container();
-            System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(Frm_Camera2D));
             System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle1 = new System.Windows.Forms.DataGridViewCellStyle();
+            System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle4 = new System.Windows.Forms.DataGridViewCellStyle();
+            System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(Frm_Camera2D));
             System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle2 = new System.Windows.Forms.DataGridViewCellStyle();
+            System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle3 = new System.Windows.Forms.DataGridViewCellStyle();
             this.tabPanel_Main = new DevExpress.Utils.Layout.TablePanel();
             this.split_Display = new DevExpress.XtraEditors.SplitContainerControl();
             this.tablePanel1 = new DevExpress.Utils.Layout.TablePanel();
@@ -41,6 +43,7 @@
             this.btn_DisConnect = new DevExpress.XtraEditors.SimpleButton();
             this.btn_Connect = new DevExpress.XtraEditors.SimpleButton();
             this.panelControl3 = new DevExpress.XtraEditors.PanelControl();
+            this.dgv_CameraConfig = new System.Windows.Forms.DataGridView();
             this.panelControl2 = new DevExpress.XtraEditors.PanelControl();
             this.cmb_TriggerSource = new DevExpress.XtraEditors.ComboBoxEdit();
             this.txt_MaxExposure = new DevExpress.XtraEditors.LabelControl();
@@ -65,7 +68,6 @@
             this.labelControl6 = new DevExpress.XtraEditors.LabelControl();
             this.cmb_Manufacturers = new DevExpress.XtraEditors.ComboBoxEdit();
             this.user_ShowDisplay = new Cognex.VisionPro.Display.CogDisplay();
-            this.dgv_CameraConfig = new System.Windows.Forms.DataGridView();
             this.col_Sn = new System.Windows.Forms.DataGridViewTextBoxColumn();
             this.col_Expain = new System.Windows.Forms.DataGridViewTextBoxColumn();
             ((System.ComponentModel.ISupportInitialize)(this.tabPanel_Main)).BeginInit();
@@ -82,6 +84,7 @@
             this.panelControl1.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.panelControl3)).BeginInit();
             this.panelControl3.SuspendLayout();
+            ((System.ComponentModel.ISupportInitialize)(this.dgv_CameraConfig)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.panelControl2)).BeginInit();
             this.panelControl2.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.cmb_TriggerSource.Properties)).BeginInit();
@@ -94,7 +97,6 @@
             ((System.ComponentModel.ISupportInitialize)(this.cmb_SnList.Properties)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.cmb_Manufacturers.Properties)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.user_ShowDisplay)).BeginInit();
-            ((System.ComponentModel.ISupportInitialize)(this.dgv_CameraConfig)).BeginInit();
             this.SuspendLayout();
             // 
             // tabPanel_Main
@@ -237,6 +239,44 @@
             this.tablePanel1.SetRow(this.panelControl3, 1);
             this.panelControl3.Size = new System.Drawing.Size(583, 201);
             this.panelControl3.TabIndex = 25;
+            // 
+            // dgv_CameraConfig
+            // 
+            this.dgv_CameraConfig.AllowUserToAddRows = false;
+            this.dgv_CameraConfig.AllowUserToDeleteRows = false;
+            this.dgv_CameraConfig.BackgroundColor = System.Drawing.Color.FromArgb(((int)(((byte)(64)))), ((int)(((byte)(64)))), ((int)(((byte)(64)))));
+            dataGridViewCellStyle1.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleLeft;
+            dataGridViewCellStyle1.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(64)))), ((int)(((byte)(64)))), ((int)(((byte)(64)))));
+            dataGridViewCellStyle1.Font = new System.Drawing.Font("Tahoma", 9F);
+            dataGridViewCellStyle1.ForeColor = System.Drawing.Color.White;
+            dataGridViewCellStyle1.SelectionBackColor = System.Drawing.Color.FromArgb(((int)(((byte)(64)))), ((int)(((byte)(64)))), ((int)(((byte)(64)))));
+            dataGridViewCellStyle1.SelectionForeColor = System.Drawing.Color.White;
+            dataGridViewCellStyle1.WrapMode = System.Windows.Forms.DataGridViewTriState.True;
+            this.dgv_CameraConfig.ColumnHeadersDefaultCellStyle = dataGridViewCellStyle1;
+            this.dgv_CameraConfig.ColumnHeadersHeightSizeMode = System.Windows.Forms.DataGridViewColumnHeadersHeightSizeMode.AutoSize;
+            this.dgv_CameraConfig.Columns.AddRange(new System.Windows.Forms.DataGridViewColumn[] {
+            this.col_Sn,
+            this.col_Expain});
+            dataGridViewCellStyle4.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleLeft;
+            dataGridViewCellStyle4.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(64)))), ((int)(((byte)(64)))), ((int)(((byte)(64)))));
+            dataGridViewCellStyle4.Font = new System.Drawing.Font("Tahoma", 9F);
+            dataGridViewCellStyle4.ForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(40)))), ((int)(((byte)(40)))), ((int)(((byte)(40)))));
+            dataGridViewCellStyle4.SelectionBackColor = System.Drawing.SystemColors.Highlight;
+            dataGridViewCellStyle4.SelectionForeColor = System.Drawing.Color.White;
+            dataGridViewCellStyle4.WrapMode = System.Windows.Forms.DataGridViewTriState.False;
+            this.dgv_CameraConfig.DefaultCellStyle = dataGridViewCellStyle4;
+            this.dgv_CameraConfig.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.dgv_CameraConfig.EnableHeadersVisualStyles = false;
+            this.dgv_CameraConfig.GridColor = System.Drawing.Color.White;
+            this.dgv_CameraConfig.Location = new System.Drawing.Point(0, 0);
+            this.dgv_CameraConfig.Name = "dgv_CameraConfig";
+            this.dgv_CameraConfig.RowHeadersVisible = false;
+            this.dgv_CameraConfig.RowHeadersWidth = 62;
+            this.dgv_CameraConfig.RowTemplate.Height = 30;
+            this.dgv_CameraConfig.SelectionMode = System.Windows.Forms.DataGridViewSelectionMode.FullRowSelect;
+            this.dgv_CameraConfig.Size = new System.Drawing.Size(583, 201);
+            this.dgv_CameraConfig.TabIndex = 0;
+            this.dgv_CameraConfig.CellValueChanged += new System.Windows.Forms.DataGridViewCellEventHandler(this.dgv_CameraConfig_CellValueChanged);
             // 
             // panelControl2
             // 
@@ -593,60 +633,24 @@
             this.user_ShowDisplay.Size = new System.Drawing.Size(737, 683);
             this.user_ShowDisplay.TabIndex = 1;
             // 
-            // dgv_CameraConfig
-            // 
-            this.dgv_CameraConfig.AllowUserToDeleteRows = false;
-            this.dgv_CameraConfig.AllowUserToResizeRows = false;
-            this.dgv_CameraConfig.BackgroundColor = System.Drawing.Color.Black;
-            this.dgv_CameraConfig.BorderStyle = System.Windows.Forms.BorderStyle.Fixed3D;
-            dataGridViewCellStyle1.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleLeft;
-            dataGridViewCellStyle1.BackColor = System.Drawing.Color.Black;
-            dataGridViewCellStyle1.Font = new System.Drawing.Font("Tahoma", 9F);
-            dataGridViewCellStyle1.ForeColor = System.Drawing.Color.White;
-            dataGridViewCellStyle1.SelectionBackColor = System.Drawing.SystemColors.Highlight;
-            dataGridViewCellStyle1.SelectionForeColor = System.Drawing.SystemColors.HighlightText;
-            dataGridViewCellStyle1.WrapMode = System.Windows.Forms.DataGridViewTriState.True;
-            this.dgv_CameraConfig.ColumnHeadersDefaultCellStyle = dataGridViewCellStyle1;
-            this.dgv_CameraConfig.ColumnHeadersHeightSizeMode = System.Windows.Forms.DataGridViewColumnHeadersHeightSizeMode.AutoSize;
-            this.dgv_CameraConfig.Columns.AddRange(new System.Windows.Forms.DataGridViewColumn[] {
-            this.col_Sn,
-            this.col_Expain});
-            this.dgv_CameraConfig.Cursor = System.Windows.Forms.Cursors.Hand;
-            dataGridViewCellStyle2.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleLeft;
-            dataGridViewCellStyle2.BackColor = System.Drawing.Color.Black;
-            dataGridViewCellStyle2.Font = new System.Drawing.Font("Tahoma", 9F);
-            dataGridViewCellStyle2.ForeColor = System.Drawing.Color.White;
-            dataGridViewCellStyle2.SelectionBackColor = System.Drawing.SystemColors.Highlight;
-            dataGridViewCellStyle2.SelectionForeColor = System.Drawing.SystemColors.HighlightText;
-            dataGridViewCellStyle2.WrapMode = System.Windows.Forms.DataGridViewTriState.False;
-            this.dgv_CameraConfig.DefaultCellStyle = dataGridViewCellStyle2;
-            this.dgv_CameraConfig.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.dgv_CameraConfig.GridColor = System.Drawing.Color.Black;
-            this.dgv_CameraConfig.Location = new System.Drawing.Point(0, 0);
-            this.dgv_CameraConfig.Name = "dgv_CameraConfig";
-            this.dgv_CameraConfig.RowHeadersVisible = false;
-            this.dgv_CameraConfig.RowHeadersWidth = 62;
-            this.dgv_CameraConfig.RowTemplate.Height = 30;
-            this.dgv_CameraConfig.Size = new System.Drawing.Size(583, 201);
-            this.dgv_CameraConfig.TabIndex = 0;
-            // 
             // col_Sn
             // 
+            dataGridViewCellStyle2.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(64)))), ((int)(((byte)(64)))), ((int)(((byte)(64)))));
+            this.col_Sn.DefaultCellStyle = dataGridViewCellStyle2;
             this.col_Sn.HeaderText = "序列号";
             this.col_Sn.MinimumWidth = 8;
             this.col_Sn.Name = "col_Sn";
             this.col_Sn.ReadOnly = true;
-            this.col_Sn.SortMode = System.Windows.Forms.DataGridViewColumnSortMode.NotSortable;
-            this.col_Sn.Width = 250;
+            this.col_Sn.Width = 150;
             // 
             // col_Expain
             // 
             this.col_Expain.AutoSizeMode = System.Windows.Forms.DataGridViewAutoSizeColumnMode.Fill;
+            dataGridViewCellStyle3.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(64)))), ((int)(((byte)(64)))), ((int)(((byte)(64)))));
+            this.col_Expain.DefaultCellStyle = dataGridViewCellStyle3;
             this.col_Expain.HeaderText = "备注";
             this.col_Expain.MinimumWidth = 8;
             this.col_Expain.Name = "col_Expain";
-            this.col_Expain.SortMode = System.Windows.Forms.DataGridViewColumnSortMode.NotSortable;
-            this.col_Expain.ToolTipText = "自定义设备名称";
             // 
             // Frm_Camera2D
             // 
@@ -673,6 +677,7 @@
             this.panelControl1.ResumeLayout(false);
             ((System.ComponentModel.ISupportInitialize)(this.panelControl3)).EndInit();
             this.panelControl3.ResumeLayout(false);
+            ((System.ComponentModel.ISupportInitialize)(this.dgv_CameraConfig)).EndInit();
             ((System.ComponentModel.ISupportInitialize)(this.panelControl2)).EndInit();
             this.panelControl2.ResumeLayout(false);
             this.panelControl2.PerformLayout();
@@ -687,7 +692,6 @@
             ((System.ComponentModel.ISupportInitialize)(this.cmb_SnList.Properties)).EndInit();
             ((System.ComponentModel.ISupportInitialize)(this.cmb_Manufacturers.Properties)).EndInit();
             ((System.ComponentModel.ISupportInitialize)(this.user_ShowDisplay)).EndInit();
-            ((System.ComponentModel.ISupportInitialize)(this.dgv_CameraConfig)).EndInit();
             this.ResumeLayout(false);
 
         }

@@ -33,7 +33,7 @@ public sealed class CameraManager
     /// <summary>
     /// 已添加的相机配置
     /// </summary>
-    private Dictionary<string, CameraConfig> _userCameraConfigs; // 用户添加的相机配置（键：序列号）
+    private Dictionary<string, CameraConfig> _userCameraConfigs;
 
     // 存储：厂商 -> (枚举方法委托, 插件类型)
     private readonly Dictionary<string, (Func<List<string>> EnumerateFunc, Type PluginType)> ManufacturerMap;
@@ -261,33 +261,6 @@ public sealed class CameraManager
     }
 
     /// <summary>
-    /// 添加/更新相机配置（自动同步本地）
-    /// </summary>
-    public bool AddOrUpdateCameraConfig(CameraConfig config)
-    {
-        if (config == null || string.IsNullOrEmpty(config.SerialNumber))
-        {
-            Console.WriteLine("配置无效（序列号不能为空）");
-            return false;
-        }
-
-        lock (_lockObj)
-        {
-            if (!_userCameraConfigs.ContainsKey(config.SerialNumber))
-            {
-                _userCameraConfigs.Add(config.SerialNumber, config);
-                // 实时保存到本地
-                SaveUserConfigsToLocal();
-                Console.WriteLine($"添加相机配置：{config.SerialNumber}");
-                return true;
-            }
-
-            Console.WriteLine($"序列号{config.SerialNumber}已添加");
-            return false;
-        }
-    }
-
-    /// <summary>
     /// 通过厂商名称和序列号添加/更新相机配置（自动关联插件信息）
     /// </summary>
     public bool AddOrUpdateCameraConfig(string manufacturerName, string serialNumber)
@@ -329,7 +302,16 @@ public sealed class CameraManager
             return true;
         }
     }
-
+    /// <summary>
+    /// 修改配置
+    /// </summary>
+    public void ModifyCameraConfig()
+    {
+        lock (_lockObj)
+        {
+            SaveUserConfigsToLocal();
+        }
+    }
     /// <summary>
     /// 删除相机配置（自动同步本地）
     /// </summary>
@@ -385,6 +367,24 @@ public sealed class CameraManager
         foreach (var item in temCameraList)
         {
             item.Value.Close();
+        }
+    }
+    public List<CameraConfig> GetAllUserConfigs()
+    {
+        lock (_lockObj)
+        {
+            return _userCameraConfigs.Values.ToList();
+        }
+    }
+
+    public CameraConfig GetUserConfig(string serialNumber)
+    {
+        if (string.IsNullOrEmpty(serialNumber))
+            return null;
+        lock (_lockObj)
+        {
+            _userCameraConfigs.TryGetValue(serialNumber, out var config);
+            return config;
         }
     }
 }

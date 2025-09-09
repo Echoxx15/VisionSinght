@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="utf-8"?>
+<CameraConfigCollection xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+  <CameraConfig>
+    <SerialNumber>DA3825819</SerialNumber>
+    <Expain />
+    <PluginTypeName>HikCameraPlugin.HikCamera</PluginTypeName>
+    <PluginAssemblyName>HikCameraPlugin</PluginAssemblyName>
+  </CameraConfig>
+</CameraConfigCollection>

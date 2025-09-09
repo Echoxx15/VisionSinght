@@ -1,9 +1,7 @@
 ﻿using System;
-using System.Diagnostics;
 using System.Drawing;
 using System.Windows.Forms;
 using Cognex.VisionPro;
-using DevExpress.Internal.WinApi.Windows.UI.Notifications;
 using HardwareCameraNet;
 using HardwareCameraNet.IValue;
 
@@ -19,16 +17,46 @@ public partial class Frm_Camera2D : DevExpress.XtraEditors.XtraForm
     IFloatVal Exposure;
     IFloatVal Gain;
     IStringVal TriggerSource;
+
     public Frm_Camera2D()
     {
         InitializeComponent();
     }
-
     private void Frm_Camera2D_Load(object sender, EventArgs e)
     {
         cmb_Manufacturers.Properties.Items.AddRange(CameraManager.Instance.GetAllManufacturers());
-        dgv_CameraConfig
+
+        // 清空并加载本地相机配置到表格
+        dgv_CameraConfig.Rows.Clear();
+        foreach (var config in CameraManager.Instance.GetAllUserConfigs())
+        {
+            dgv_CameraConfig.Rows.Add(config.SerialNumber, config.Expain);
+        }
+
         SetControlState();
+    }
+
+
+    private void dgv_CameraConfig_CellValueChanged(object sender, DataGridViewCellEventArgs e)
+    {
+
+        var expainCol = dgv_CameraConfig.Columns["col_Expain"];
+        if (expainCol == null) return; // 列未初始化，直接返回
+
+        if (e.ColumnIndex != expainCol.Index) return;
+
+        var sn = dgv_CameraConfig.Rows[e.RowIndex].Cells["col_Sn"].Value?.ToString();
+        var expain = dgv_CameraConfig.Rows[e.RowIndex].Cells["col_Expain"].Value?.ToString();
+
+        if (!string.IsNullOrEmpty(sn))
+        {
+            var config = CameraManager.Instance.GetUserConfig(sn);
+            if (config != null)
+            {
+                config.Expain = expain;
+                CameraManager.Instance.ModifyCameraConfig(); // 自动保存
+            }
+        }
     }
 
     private void SetControlState(bool connect = false)
@@ -229,6 +257,7 @@ public partial class Frm_Camera2D : DevExpress.XtraEditors.XtraForm
     {
         currentSelectedCamera.SetTriggerSource(cmb_TriggerSource.Text);
     }
+
     private void btn_Add_Click(object sender, EventArgs e)
     {
         var selectedManufacturer = cmb_Manufacturers.Text;
@@ -239,20 +268,39 @@ public partial class Frm_Camera2D : DevExpress.XtraEditors.XtraForm
             return;
         }
 
-        CameraManager.Instance.AddOrUpdateCameraConfig(selectedManufacturer, selectedSerial);
-        //if (success)
-        //{
-        //    MessageBox.Show($"相机{selectedSerial}已添加到配置");
-        //}
-        //else
-        //{
-        //    MessageBox.Show("添加失败，可能是重复添加或厂商不支持");
-        //}
+        if (CameraManager.Instance.AddOrUpdateCameraConfig(selectedManufacturer, selectedSerial))
+            dgv_CameraConfig.Rows.Add(selectedSerial, "");
     }
 
     private void btn_Remove_Click(object sender, EventArgs e)
     {
+        // 判断是否有选中行
+        if (dgv_CameraConfig.SelectedRows.Count == 0)
+        {
+            //MessageBox.Show("请先选择要移除的相机配置行！");
+            return;
+        }
 
+        // 获取选中行
+        var row = dgv_CameraConfig.SelectedRows[0];
+        var sn = row.Cells["col_Sn"].Value?.ToString();
+
+        if (string.IsNullOrEmpty(sn))
+        {
+            MessageBox.Show("选中的行序列号无效！");
+            return;
+        }
+
+        // 调用CameraManager移除配置
+        if (CameraManager.Instance.RemoveCameraConfig(sn))
+        {
+            dgv_CameraConfig.Rows.Remove(row);
+            //MessageBox.Show($"已移除相机配置：{sn}");
+        }
+        else
+        {
+            MessageBox.Show("移除失败，未找到该序列号的配置！");
+        }
     }
     private void btn_Connect_Click(object sender, EventArgs e)
     {
@@ -318,5 +366,4 @@ public partial class Frm_Camera2D : DevExpress.XtraEditors.XtraForm
         }
         base.Dispose(disposing);
     }
-
 }
