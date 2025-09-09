@@ -256,7 +256,7 @@ public partial class Frm_Camera2D : DevExpress.XtraEditors.XtraForm
         {
             currentSelectedCamera.DisConnet();
             SetControlState(currentSelectedCamera.IsConnected);
-            currentSelectedCamera.DisConnetEvent -= DisConnectEvent;
+            //currentSelectedCamera.DisConnetEvent -= DisConnectEvent;
         }
         catch (Exception exception)
         {
