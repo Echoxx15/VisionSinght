@@ -30,8 +30,8 @@
         {
             this.components = new System.ComponentModel.Container();
             System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(Frm_Main));
-            DevExpress.Utils.SuperToolTip superToolTip1 = new DevExpress.Utils.SuperToolTip();
-            DevExpress.Utils.ToolTipItem toolTipItem1 = new DevExpress.Utils.ToolTipItem();
+            DevExpress.Utils.SuperToolTip superToolTip2 = new DevExpress.Utils.SuperToolTip();
+            DevExpress.Utils.ToolTipItem toolTipItem2 = new DevExpress.Utils.ToolTipItem();
             this.dev_MainBarManager = new DevExpress.XtraBars.BarManager(this.components);
             this.dx_ToolBar = new DevExpress.XtraBars.Bar();
             this.dev_MainStatusBar = new DevExpress.XtraBars.Bar();
@@ -66,6 +66,7 @@
             this.dockPanel4_Container = new DevExpress.XtraBars.Docking.ControlContainer();
             this.dockPanel5 = new DevExpress.XtraBars.Docking.DockPanel();
             this.dockPanel5_Container = new DevExpress.XtraBars.Docking.ControlContainer();
+            this.frm_Log1 = new Logger.Frm_Log();
             ((System.ComponentModel.ISupportInitialize)(this.dev_MainBarManager)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.dev_MainDockManager)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.repositoryItemCheckedComboBoxEdit1)).BeginInit();
@@ -155,9 +156,9 @@
             this.btn_Login.ImageOptions.SvgImage = ((DevExpress.Utils.Svg.SvgImage)(resources.GetObject("btn_Login.ImageOptions.SvgImage")));
             this.btn_Login.Name = "btn_Login";
             this.btn_Login.PaintStyle = DevExpress.XtraBars.BarItemPaintStyle.CaptionGlyph;
-            toolTipItem1.Text = "登录";
-            superToolTip1.Items.Add(toolTipItem1);
-            this.btn_Login.SuperTip = superToolTip1;
+            toolTipItem2.Text = "登录";
+            superToolTip2.Items.Add(toolTipItem2);
+            this.btn_Login.SuperTip = superToolTip2;
             // 
             // btn_View
             // 
@@ -199,7 +200,7 @@
             // 
             this.barDockControlBottom.CausesValidation = false;
             this.barDockControlBottom.Dock = System.Windows.Forms.DockStyle.Bottom;
-            this.barDockControlBottom.Location = new System.Drawing.Point(0, 803);
+            this.barDockControlBottom.Location = new System.Drawing.Point(0, 885);
             this.barDockControlBottom.Manager = this.dev_MainBarManager;
             this.barDockControlBottom.Size = new System.Drawing.Size(1327, 20);
             // 
@@ -209,7 +210,7 @@
             this.barDockControlLeft.Dock = System.Windows.Forms.DockStyle.Left;
             this.barDockControlLeft.Location = new System.Drawing.Point(0, 55);
             this.barDockControlLeft.Manager = this.dev_MainBarManager;
-            this.barDockControlLeft.Size = new System.Drawing.Size(0, 748);
+            this.barDockControlLeft.Size = new System.Drawing.Size(0, 830);
             // 
             // barDockControlRight
             // 
@@ -217,7 +218,7 @@
             this.barDockControlRight.Dock = System.Windows.Forms.DockStyle.Right;
             this.barDockControlRight.Location = new System.Drawing.Point(1327, 55);
             this.barDockControlRight.Manager = this.dev_MainBarManager;
-            this.barDockControlRight.Size = new System.Drawing.Size(0, 748);
+            this.barDockControlRight.Size = new System.Drawing.Size(0, 830);
             // 
             // dev_MainDockManager
             // 
@@ -250,7 +251,7 @@
             this.dockPanel6.Location = new System.Drawing.Point(0, 55);
             this.dockPanel6.Name = "dockPanel6";
             this.dockPanel6.OriginalSize = new System.Drawing.Size(200, 200);
-            this.dockPanel6.Size = new System.Drawing.Size(200, 748);
+            this.dockPanel6.Size = new System.Drawing.Size(200, 830);
             this.dockPanel6.Text = "工具栏";
             // 
             // dockPanel7
@@ -260,7 +261,7 @@
             this.dockPanel7.Location = new System.Drawing.Point(200, 55);
             this.dockPanel7.Name = "dockPanel7";
             this.dockPanel7.OriginalSize = new System.Drawing.Size(264, 200);
-            this.dockPanel7.Size = new System.Drawing.Size(264, 748);
+            this.dockPanel7.Size = new System.Drawing.Size(264, 830);
             this.dockPanel7.Text = "流程栏";
             // 
             // dockPanel8
@@ -270,18 +271,18 @@
             this.dockPanel8.ID = new System.Guid("fb5b1396-3ac9-4820-93f2-1ccd7a5708a0");
             this.dockPanel8.Location = new System.Drawing.Point(464, 55);
             this.dockPanel8.Name = "dockPanel8";
-            this.dockPanel8.OriginalSize = new System.Drawing.Size(200, 577);
-            this.dockPanel8.Size = new System.Drawing.Size(863, 577);
+            this.dockPanel8.OriginalSize = new System.Drawing.Size(200, 748);
+            this.dockPanel8.Size = new System.Drawing.Size(863, 748);
             this.dockPanel8.Text = "显示";
             // 
             // dockPanel9
             // 
             this.dockPanel9.Dock = DevExpress.XtraBars.Docking.DockingStyle.Right;
             this.dockPanel9.ID = new System.Guid("3055d933-9df8-462b-b59b-bc49bb673561");
-            this.dockPanel9.Location = new System.Drawing.Point(1001, 632);
+            this.dockPanel9.Location = new System.Drawing.Point(1001, 803);
             this.dockPanel9.Name = "dockPanel9";
             this.dockPanel9.OriginalSize = new System.Drawing.Size(326, 200);
-            this.dockPanel9.Size = new System.Drawing.Size(326, 171);
+            this.dockPanel9.Size = new System.Drawing.Size(326, 82);
             this.dockPanel9.Text = "硬件状态";
             // 
             // dockPanel10
@@ -289,10 +290,10 @@
             this.dockPanel10.Dock = DevExpress.XtraBars.Docking.DockingStyle.Fill;
             this.dockPanel10.FloatVertical = true;
             this.dockPanel10.ID = new System.Guid("a8f203f8-ceee-43f0-94dc-333a9064d704");
-            this.dockPanel10.Location = new System.Drawing.Point(464, 632);
+            this.dockPanel10.Location = new System.Drawing.Point(464, 803);
             this.dockPanel10.Name = "dockPanel10";
             this.dockPanel10.OriginalSize = new System.Drawing.Size(1328, 200);
-            this.dockPanel10.Size = new System.Drawing.Size(537, 171);
+            this.dockPanel10.Size = new System.Drawing.Size(537, 82);
             this.dockPanel10.Text = "信息栏";
             // 
             // repositoryItemCheckedComboBoxEdit1
@@ -412,11 +413,21 @@
             this.dockPanel5_Container.Size = new System.Drawing.Size(189, 706);
             this.dockPanel5_Container.TabIndex = 0;
             // 
+            // frm_Log1
+            // 
+            this.frm_Log1.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.frm_Log1.Location = new System.Drawing.Point(464, 803);
+            this.frm_Log1.Margin = new System.Windows.Forms.Padding(3, 4, 3, 4);
+            this.frm_Log1.Name = "frm_Log1";
+            this.frm_Log1.Size = new System.Drawing.Size(537, 82);
+            this.frm_Log1.TabIndex = 9;
+            // 
             // Frm_Main
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(10F, 22F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(1327, 823);
+            this.ClientSize = new System.Drawing.Size(1327, 905);
+            this.Controls.Add(this.frm_Log1);
             this.Controls.Add(this.dockPanel10);
             this.Controls.Add(this.dockPanel9);
             this.Controls.Add(this.dockPanel8);
@@ -427,7 +438,11 @@
             this.Controls.Add(this.barDockControlBottom);
             this.Controls.Add(this.barDockControlTop);
             this.Name = "Frm_Main";
+            this.StartPosition = System.Windows.Forms.FormStartPosition.CenterScreen;
             this.Text = "Frm_Main";
+            this.WindowState = System.Windows.Forms.FormWindowState.Minimized;
+            this.FormClosed += new System.Windows.Forms.FormClosedEventHandler(this.Frm_Main_FormClosed);
+            this.Load += new System.EventHandler(this.Frm_Main_Load);
             ((System.ComponentModel.ISupportInitialize)(this.dev_MainBarManager)).EndInit();
             ((System.ComponentModel.ISupportInitialize)(this.dev_MainDockManager)).EndInit();
             ((System.ComponentModel.ISupportInitialize)(this.repositoryItemCheckedComboBoxEdit1)).EndInit();
@@ -481,5 +496,6 @@
         private DevExpress.XtraBars.Docking.ControlContainer dockPanel4_Container;
         private DevExpress.XtraBars.Docking.DockPanel dockPanel5;
         private DevExpress.XtraBars.Docking.ControlContainer dockPanel5_Container;
+        private Logger.Frm_Log frm_Log1;
     }
 }

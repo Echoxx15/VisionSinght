@@ -18,6 +18,9 @@ EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "VisionCore", "01MainForm\VisionCore\VisionCore.csproj", "{C1EC5193-9AE2-486B-A80F-E0CABC76993E}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MainForm", "01MainForm\MainForm\MainForm.csproj", "{16BA9774-F2A0-4994-8850-9AC642310541}"
+	ProjectSection(ProjectDependencies) = postProject
+		{72372FEE-826B-42F8-9B33-1D4A9646DEFC} = {72372FEE-826B-42F8-9B33-1D4A9646DEFC}
+	EndProjectSection
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CameraInterface", "03HardwareCameraNet\CameraInterface\CameraInterface.csproj", "{02D11C38-CC51-4BA5-AC42-C5091B86ABBB}"
 	ProjectSection(ProjectDependencies) = postProject
@@ -25,6 +28,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CameraInterface", "03Hardwa
 	EndProjectSection
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "HikCameraPlugin", "03HardwareCameraNet\HikCameraPlugin\HikCameraPlugin.csproj", "{72372FEE-826B-42F8-9B33-1D4A9646DEFC}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "iRAYPLECameraPlugin", "03HardwareCameraNet\iRAYPLECameraPlugin\iRAYPLECameraPlugin.csproj", "{73EC26B7-5E9A-4D72-8369-8A3AAB822AAB}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -52,6 +57,10 @@ Global
 		{72372FEE-826B-42F8-9B33-1D4A9646DEFC}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{72372FEE-826B-42F8-9B33-1D4A9646DEFC}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{72372FEE-826B-42F8-9B33-1D4A9646DEFC}.Release|Any CPU.Build.0 = Release|Any CPU
+		{73EC26B7-5E9A-4D72-8369-8A3AAB822AAB}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{73EC26B7-5E9A-4D72-8369-8A3AAB822AAB}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{73EC26B7-5E9A-4D72-8369-8A3AAB822AAB}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{73EC26B7-5E9A-4D72-8369-8A3AAB822AAB}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -64,6 +73,7 @@ Global
 		{16BA9774-F2A0-4994-8850-9AC642310541} = {D6D31331-7BBA-42E2-8167-81B994E35072}
 		{02D11C38-CC51-4BA5-AC42-C5091B86ABBB} = {7052A41D-7311-4351-BEB3-BABD0ECA81E2}
 		{72372FEE-826B-42F8-9B33-1D4A9646DEFC} = {7052A41D-7311-4351-BEB3-BABD0ECA81E2}
+		{73EC26B7-5E9A-4D72-8369-8A3AAB822AAB} = {7052A41D-7311-4351-BEB3-BABD0ECA81E2}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {1CD0725C-F43F-404E-B58F-4C4BA319D6FB}

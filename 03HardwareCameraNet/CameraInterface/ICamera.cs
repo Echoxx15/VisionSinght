@@ -1,5 +1,4 @@
 using System;
-using System.Drawing;
 using HardwareCameraNet.IValue;
 using VisionCore.PluginBase;
 
@@ -8,12 +7,16 @@ namespace HardwareCameraNet;
 /// <summary>
 /// 相机接口，定义所有相机插件必须实现的方法和属性
 /// </summary>
-public interface ICamera : IPlugin,IDisposable
+public interface ICamera : IPlugin
 {
     /// <summary>
     /// 图片回调事件
     /// </summary>
-    event EventHandler<Bitmap> FrameGrabedEvent;
+    event EventHandler<object> FrameGrabedEvent;
+    /// <summary>
+    /// 掉线事件,掉线时触发，true 表示掉线，false表示恢复
+    /// </summary>
+    event EventHandler<object> DisConnetEvent;
 
     #region 属性
     /// <summary>
@@ -76,6 +79,10 @@ public interface ICamera : IPlugin,IDisposable
     /// </summary>
     /// <returns></returns>
     void ContinuousGrab();
+    /// <summary>
+    /// 停止持续抓图
+    /// </summary>
+    void StopContinuousGrab();
     /// <summary>
     /// 开始抓图
     /// </summary>

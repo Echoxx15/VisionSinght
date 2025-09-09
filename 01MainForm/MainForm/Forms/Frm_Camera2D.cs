@@ -1,6 +1,9 @@
 ﻿using System;
+using System.Diagnostics;
 using System.Drawing;
 using System.Windows.Forms;
+using Cognex.VisionPro;
+using DevExpress.Internal.WinApi.Windows.UI.Notifications;
 using HardwareCameraNet;
 using HardwareCameraNet.IValue;
 
@@ -24,16 +27,13 @@ public partial class Frm_Camera2D : DevExpress.XtraEditors.XtraForm
     private void Frm_Camera2D_Load(object sender, EventArgs e)
     {
         cmb_Manufacturers.Properties.Items.AddRange(CameraManager.Instance.GetAllManufacturers());
-        //user_ShowDisplay = new CogDisplay();
-        //user_ShowDisplay.Dock = DockStyle.Fill;
-        //split_Display.Panel2.Controls.Add(user_ShowDisplay);
+        SetControlState();
     }
 
-    private void SetControlState(bool flag = false)
+    private void SetControlState(bool connect = false)
     {
-        chk_HardTrigger.Checked = currentSelectedCamera.GetTriggerSource().CurEnumEntry != "Software";
-        chk_Hard_CheckedChanged(null, null);
-        if (flag)
+        SetControlText();
+        if (connect)
         {
             txt_Exposure.Enabled = true;
             txt_Gain.Enabled = true;
@@ -41,8 +41,9 @@ public partial class Frm_Camera2D : DevExpress.XtraEditors.XtraForm
 
             btn_Connect.Enabled = false;
             btn_TriggerOnce.Enabled = true;
-            btn_Close.Enabled = true;
+            btn_DisConnect.Enabled = true;
             btn_Continuous.Enabled = true;
+            chk_HardTrigger.Checked = TriggerSource.CurEnumEntry != "Software";
         }
         else
         {
@@ -52,25 +53,31 @@ public partial class Frm_Camera2D : DevExpress.XtraEditors.XtraForm
 
             btn_Connect.Enabled = true;
             btn_TriggerOnce.Enabled = false;
-            btn_Close.Enabled = false;
+            btn_DisConnect.Enabled = false;
             btn_Continuous.Enabled = false;
+            chk_HardTrigger.Checked = false;
         }
+        chk_HardTrigger_CheckedChanged(null, null);
+        
     }
     private void SetControlText()
     {
         try
         {
-            if (currentSelectedCamera.IsConnected) return;
+            if(currentSelectedCamera == null)return;
 
-            Exposure = currentSelectedCamera.GetExposureTime();
-            Gain = currentSelectedCamera.GetGain();
-            TriggerSource = currentSelectedCamera.GetTriggerSource();
-            txt_Exposure.Text = Exposure.CurValue.ToString();
-            txt_Gain.Text = Gain.ToString();
-            txt_MaxExposure.Text = Exposure.Max.ToString("F5");
-            txt_MaxGain.Text = Gain.Max.ToString("F5");
-            btn_Connect.Enabled = !currentSelectedCamera.IsConnected;
-            cmb_TriggerSource.Properties.Items.AddRange(TriggerSource.SupportEnumEntries);
+            if (currentSelectedCamera.IsConnected)
+            {
+                Exposure = currentSelectedCamera.GetExposureTime();
+                Gain = currentSelectedCamera.GetGain();
+                TriggerSource = currentSelectedCamera.GetTriggerSource();
+            }
+
+            txt_Exposure.EditValue = Exposure == null? "": Exposure.CurValue;
+            txt_Gain.EditValue = Gain == null ? "" : Gain.ToString();
+            txt_MaxExposure.Text = Exposure == null ? "" : Exposure.Max.ToString("F5");
+            txt_MaxGain.Text = Gain == null ? "" : Gain.Max.ToString("F5");
+            cmb_TriggerSource.Properties.Items.AddRange(TriggerSource == null ? [] : TriggerSource.SupportEnumEntries);
         }
         catch (Exception)
         {
@@ -99,21 +106,30 @@ public partial class Frm_Camera2D : DevExpress.XtraEditors.XtraForm
             {
                 MessageBox.Show($"获取相机{selectedSerial}失败", "错误", MessageBoxButtons.OK, MessageBoxIcon.Error);
                 currentSelectedCamera = null;
-                SetControlState(flag: false); // 更新UI为未连接状态
+                SetControlState(connect: false); // 更新UI为未连接状态
                 return;
             }
 
-            // 订阅新相机的事件（此时同一相机实例不会重复订阅，因步骤1已清空）
+            // 订阅新相机的事件
             SubscribeNewCameraEvent(newCamera);
 
             //更新当前相机状态，并同步UI
             currentSelectedCamera = newCamera;
-            SetControlText();
+            SetControlState(currentSelectedCamera.IsConnected);
+            
         }
         catch (Exception)
         {
             // ignored
         }
+    }
+
+    private void cmb_Manufacturers_SelectedIndexChanged(object sender, EventArgs e)
+    {
+        cmb_SnList.SelectedText = "";
+        cmb_SnList.Properties.Items.Clear();
+        var list = CameraManager.Instance.EnumerateDevices(cmb_Manufacturers.Text);
+        cmb_SnList.Properties.Items.AddRange(list);
     }
     /// <summary>
     /// 订阅新相机的FrameGrabedEvent（确保只订阅一次）
@@ -122,7 +138,7 @@ public partial class Frm_Camera2D : DevExpress.XtraEditors.XtraForm
     {
         if (newCamera == null) return;
 
-        // （可选）双重保险：订阅前先取消一次（防止相机实例被其他地方订阅过）
+        //订阅前先取消一次（防止相机实例被其他地方订阅过）
         newCamera.FrameGrabedEvent -= UpdateUIImage;
         // 正式订阅
         newCamera.FrameGrabedEvent += UpdateUIImage;
@@ -135,22 +151,42 @@ public partial class Frm_Camera2D : DevExpress.XtraEditors.XtraForm
     {
         if (currentSelectedCamera != null)
         {
-            // 取消订阅（必须与订阅的方法完全一致，此处为UpdateUIImage）
+            // 取消订阅
             currentSelectedCamera.FrameGrabedEvent -= UpdateUIImage;
             Console.WriteLine($"取消订阅相机{currentSelectedCamera.SN}的图像事件");
         }
     }
 
-    private void UpdateUIImage(object sender, Bitmap bmp)
+    private void UpdateUIImage(object sender, object img)
     {
-        if (user_ShowDisplay.InvokeRequired)
+        lock (this)
         {
-            user_ShowDisplay.BeginInvoke(new Action<object, Bitmap>(UpdateUIImage), bmp);
+            if (user_ShowDisplay.InvokeRequired)
+            {
+                user_ShowDisplay.BeginInvoke(
+                    new Action<object, object>(UpdateUIImage),
+                    sender,  // 传递事件源
+                    img      // 传递图像参数
+                );
+            }
+            else
+            {
+                var bmp = (Bitmap)img;
+                user_ShowDisplay.Image = bmp.PixelFormat == System.Drawing.Imaging.PixelFormat.Format24bppRgb ? new CogImage24PlanarColor(bmp) : new CogImage8Grey(bmp);
+            }
         }
-        else
+    }
+
+    private void DisConnectEvent(object sender, object disconnect)
+    {
+        Invoke(() =>
         {
-            //user_ShowDisplay.Image = imageData;
-        }
+            if (cmb_SnList.SelectedText == ((ICamera)sender).SN)
+            {
+                SetControlState(!(bool)disconnect);
+            }
+        });
+
     }
 
     private void txt_Exposure_EditValueChanged(object sender, EventArgs e)
@@ -188,37 +224,39 @@ public partial class Frm_Camera2D : DevExpress.XtraEditors.XtraForm
             MessageBox.Show("增益设置失败" + exception, "", MessageBoxButtons.OK);
         }
     }
-
-    private void chk_Hard_CheckedChanged(object sender, EventArgs e)
-    {
-        cmb_TriggerSource.SelectedIndex = 0;
-        cmb_TriggerSource.Visible = chk_HardTrigger.Checked;
-    }
     private void cmb_TriggerSource_SelectedIndexChanged(object sender, EventArgs e)
     {
         currentSelectedCamera.SetTriggerSource(cmb_TriggerSource.Text);
     }
+    private void btn_Add_Click(object sender, EventArgs e)
+    {
+        //CameraManager.Instance.AddOrUpdateCameraConfig(new CameraConfig(currentSelectedCamera.SN,currentSelectedCamera.);
+    }
 
+    private void btn_Remove_Click(object sender, EventArgs e)
+    {
+
+    }
     private void btn_Connect_Click(object sender, EventArgs e)
     {
-        int errCode = 0;
         try
         {
-            errCode = currentSelectedCamera.Open();
-            SetControlText();
+            currentSelectedCamera.Open();
             SetControlState(currentSelectedCamera.IsConnected);
+            currentSelectedCamera.DisConnetEvent += DisConnectEvent;
         }
-        catch (Exception exception)
+        catch (Exception)
         {
-            MessageBox.Show($"关闭相机失败,错误码{errCode}," + exception, "", MessageBoxButtons.OK);
+            //MessageBox.Show($"打开相机失败,错误码{errCode}," + exception, "", MessageBoxButtons.OK);
         }
     }
-    private void btn_Close_Click(object sender, EventArgs e)
+    private void btn_DisConnect_Click(object sender, EventArgs e)
     {
         try
         {
             currentSelectedCamera.DisConnet();
             SetControlState(currentSelectedCamera.IsConnected);
+            currentSelectedCamera.DisConnetEvent -= DisConnectEvent;
         }
         catch (Exception exception)
         {
@@ -235,19 +273,33 @@ public partial class Frm_Camera2D : DevExpress.XtraEditors.XtraForm
         {
             currentSelectedCamera.ContinuousGrab();
             btn_Continuous.Text = "停止采集";
-            btn_Close.Enabled = false;
+            btn_DisConnect.Enabled = false;
         }
         else
         {
-            currentSelectedCamera.SetSoftwareTrigger();
+            currentSelectedCamera.StopContinuousGrab();
             btn_Continuous.Text = "连续采集";
-            btn_Close.Enabled = true;
+            btn_DisConnect.Enabled = true;
         }
     }
-
-    private void cmb_Manufacturers_SelectedIndexChanged(object sender, EventArgs e)
+    private void chk_HardTrigger_CheckedChanged(object sender, EventArgs e)
     {
-        var list = CameraManager.Instance.EnumerateDevices(cmb_Manufacturers.Text);
-        cmb_SnList.Properties.Items.AddRange(list);
+        cmb_TriggerSource.Visible = chk_HardTrigger.Checked;
+        if (chk_HardTrigger.Checked)
+            cmb_TriggerSource.SelectedItem = TriggerSource.CurEnumEntry;
     }
+    protected override void Dispose(bool disposing)
+    {
+        if (disposing)
+        {
+            // 2. 取消相机事件订阅，避免残留引用
+            UnsubscribeCurrentCameraEvent();
+
+            // 3. 释放设计器组件（默认逻辑）
+            if (components != null)
+                components.Dispose();
+        }
+        base.Dispose(disposing);
+    }
+
 }

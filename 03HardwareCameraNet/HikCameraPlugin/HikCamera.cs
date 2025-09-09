@@ -1,6 +1,7 @@
 using System;
+using System.Collections.Concurrent;
 using System.Collections.Generic;
-using System.Drawing;
+using System.Diagnostics;
 using System.Linq;
 using System.Threading;
 using HardwareCameraNet;
@@ -23,22 +24,29 @@ public class HikCamera : ICamera
     /// <summary>
     /// 海康支持的设备类型
     /// </summary>
-    const DeviceTLayerType devLayerType = DeviceTLayerType.MvGigEDevice | DeviceTLayerType.MvUsbDevice | DeviceTLayerType.MvGenTLCameraLinkDevice
-                                          | DeviceTLayerType.MvGenTLCXPDevice | DeviceTLayerType.MvGenTLXoFDevice;
+    const DeviceTLayerType devLayerType = DeviceTLayerType.MvGigEDevice | DeviceTLayerType.MvUsbDevice;// | DeviceTLayerType.MvGenTLCameraLinkDevice
+                                                                                                       //| DeviceTLayerType.MvGenTLCXPDevice | DeviceTLayerType.MvGenTLXoFDevice;
 
 
     #region ICamera接口属性
+    // 图像回调事件（需显式实现事件添加/移除逻辑，确保线程安全）
+    private event EventHandler<object> frameGrabedEvent;
+    public event EventHandler<object> FrameGrabedEvent
+    {
+        add => frameGrabedEvent += value;
+        remove => frameGrabedEvent -= value;
+    }
+    public event EventHandler<object> DisConnetEvent;
+    public string SN { get; }
 
-    public string SN { get;}
-
-    public bool IsConnected => device.IsConnected;
+    public bool IsConnected => device is { IsConnected: true };
 
     #endregion
 
     #region 相机属性
     // 相机特有属性
     private IDevice device;
-    private static readonly Dictionary<string, IDevice> devices = new();
+    private static readonly Dictionary<string, IDeviceInfo> gDeviceInfos = new();
     /// <summary>
     /// ch: 断线重连线程 | en: Reconnect thread
     /// </summary>
@@ -46,32 +54,28 @@ public class HikCamera : ICamera
     /// <summary>
     /// ch: 帧缓存队列 | en: frame queue for process
     /// </summary>
-    private Queue<IFrameOut> _frameQueue;
-
-    /// <summary>
-    /// ch: 队列图像数量上限 | en: maximum number of frames in the queue
-    /// </summary>
-    private const uint _maxQueueSize = 50;
+    private readonly ConcurrentQueue<IFrameOut> frameQueue = new();
 
     /// <summary>
     /// ch: 异步处理线程 | asynchronous processing thread
     /// </summary>
     private Thread _asyncProcessThread;
     /// <summary>
-    /// ch: 信号，通知异步处理线程处理 | Used to notify the processing thread
+    /// ch: 队列图像数量上限 | en: maximum number of frames in the queue
     /// </summary>
-    private Semaphore _frameGrabSem;
+    private const uint _maxQueueSize = 200;
     /// <summary>
-    /// ch: 异步处理线程退出标志 | en: Flag to notify the  processing thread to exit
+    /// ch: 异步处理线程退出标志 false 不退出 | en: Flag to notify the  processing thread to exit
     /// </summary>
     private volatile bool _processThreadExit;
+
+    private readonly Stopwatch _stopwatch = new();
     #endregion
 
     #region 构造函数
     public HikCamera(string sn)
     {
         SN = sn ?? throw new ArgumentNullException(nameof(sn));
-        device = devices[SN];
     }
     #endregion
 
@@ -85,36 +89,51 @@ public class HikCamera : ICamera
             Console.WriteLine("Enum device failed:{0:x8}", ret);
             return [];
         }
-        foreach (var devInfo in devInfoList)
+        foreach (var devInfo in devInfoList.Where(devInfo => !gDeviceInfos.ContainsKey(devInfo.SerialNumber)))
         {
-            // ch:创建设备 | en:Create device
-            IDevice dev = DeviceFactory.CreateDevice(devInfo);
-            if (!devices.ContainsKey(devInfo.SerialNumber))
-                devices.Add(devInfo.SerialNumber, dev);
+            gDeviceInfos.Add(devInfo.SerialNumber, devInfo);
         }
-        return devices.Keys.ToList();
+        return gDeviceInfos.Keys.ToList();
     }
     #endregion
 
     #region 实现ICamera接口的方法
 
-    // 图像回调事件（需显式实现事件添加/移除逻辑，确保线程安全）
-    private event EventHandler<Bitmap> frameGrabedEvent;
-    public event EventHandler<Bitmap> FrameGrabedEvent
-    {
-        add => frameGrabedEvent += value;
-        remove => frameGrabedEvent -= value;
-    }
+
     public int Open()
     {
         try
         {
-            var ret = device.Open();
+            // ch:枚举设备 | en:Enum device
+            var ret = DeviceEnumerator.EnumDevices(devLayerType, out var devInfoList);
             if (ret != MvError.MV_OK)
             {
-                Console.WriteLine("Open device failed:{0:x8}", ret);
+                Console.WriteLine("Enum device failed:{0:x8}", ret);
                 return ret;
             }
+
+            if (0 == devInfoList.Count)
+            {
+                return -1;
+            }
+
+            foreach (var devInfo in devInfoList)
+            {
+                if (SN != devInfo.SerialNumber) continue;
+                device = DeviceFactory.CreateDevice(devInfo);
+                ret = device.Open();
+                if (ret != MvError.MV_OK)
+                {
+                    Console.WriteLine("Open device failed:{0:x8}", ret);
+                    return ret;
+                }
+                break;
+            }
+
+            //if (!gDeviceInfos.TryGetValue(SN, out var info)) return -1;
+
+            //device = DeviceFactory.CreateDevice(info);
+
             //ch: 判断是否为gige设备 | en: Determine whether it is a GigE device
             if (device is IGigEDevice)
             {
@@ -129,7 +148,7 @@ public class HikCamera : ICamera
                 }
                 else
                 {
-                    ret = device.Parameters.SetIntValue("GevSCPSPacketSize", (long)optionPacketSize);
+                    ret = device.Parameters.SetIntValue("GevSCPSPacketSize", optionPacketSize);
                     if (ret != MvError.MV_OK)
                     {
                         Console.WriteLine("Warning: Set Packet Size failed!");
@@ -137,7 +156,7 @@ public class HikCamera : ICamera
                 }
             }
             // ch:设置触发模式为on | en:set trigger mode as on
-            ret = device.Parameters.SetEnumValue("TriggerMode", 1);
+            ret = device.Parameters.SetEnumValueByString("TriggerMode", "On");
             if (ret != MvError.MV_OK)
             {
                 //Console.WriteLine("Set TriggerMode failed:{0:x8}", ret);
@@ -148,11 +167,9 @@ public class HikCamera : ICamera
             device.StreamGrabber.FrameGrabedEvent += FrameGrabedEventHandler;
             device.DeviceExceptionEvent += ExceptionEventHandler;
 
-            _frameQueue = new Queue<IFrameOut>();
-            _frameGrabSem = new Semaphore(0, Int32.MaxValue);
             //ch：创建异步处理线程 | en: Create an asynchronous processing thread
             _processThreadExit = false;
-            _asyncProcessThread = new Thread(AsyncProcessThread);
+            _asyncProcessThread = new Thread(AsyncProcessThread) { IsBackground = true };
             _asyncProcessThread.Start();
 
             // ch:开启抓图 || en: start grab image
@@ -174,7 +191,7 @@ public class HikCamera : ICamera
     public IFloatVal GetExposureTime()
     {
         if (device.Parameters.GetFloatValue("ExposureTime", out var val) != MvError.MV_OK) return null;
- 
+
         var floatVal = new FloatValImpl(
             curValue: Convert.ToDouble(val.CurValue),
             max: Convert.ToDouble(val.Max),
@@ -200,7 +217,7 @@ public class HikCamera : ICamera
     public IFloatVal GetGain()
     {
         if (device.Parameters.GetFloatValue("Gain", out var val) != MvError.MV_OK) return null;
-        
+
         var floatVal = new FloatValImpl(
             curValue: Convert.ToDouble(val.CurValue),
             max: Convert.ToDouble(val.Max),
@@ -224,18 +241,18 @@ public class HikCamera : ICamera
 
     public void SetSoftwareTrigger()
     {
-        device.Parameters.SetEnumValue("TriggerMode", 1);
+        device.Parameters.SetEnumValueByString("TriggerMode", "On");
         device.Parameters.SetEnumValueByString("TriggerSource", "Software");
     }
     public void SetTriggerSource(string triggerSource)
     {
-        device.Parameters.SetEnumValue("TriggerMode", 1);
+        device.Parameters.SetEnumValueByString("TriggerMode", "On");
         device.Parameters.SetEnumValueByString("TriggerSource", triggerSource);
     }
 
     public IStringVal GetTriggerSource()
     {
-        if (device.Parameters.GetEnumValue("TriggerSource", out var val) == MvError.MV_OK) return null;
+        if (device.Parameters.GetEnumValue("TriggerSource", out var val) != MvError.MV_OK) return null;
 
         List<string> se = [];
         foreach (var item in val.SupportEnumEntries)
@@ -259,7 +276,16 @@ public class HikCamera : ICamera
     public void ContinuousGrab()
     {
         device.Parameters.SetEnumValueByString("TriggerSource", "Software");
-        device.Parameters.SetEnumValue("TriggerMode", 0);
+        device.Parameters.SetEnumValueByString("TriggerMode", "Off");
+    }
+
+    public void StopContinuousGrab()
+    {
+        device.Parameters.SetEnumValueByString("TriggerMode", "On");
+        lock (this)
+        {
+            while (frameQueue.TryDequeue(out var _)) { }
+        }
     }
 
     public int StartGrabbing()
@@ -288,10 +314,11 @@ public class HikCamera : ICamera
 
     public void DisConnet()
     {
-        StopThread();
-        StopGrabbing();
+
         // ch:关闭设备 | en:Close device
         if (device == null) return;
+        StopThread();
+        StopGrabbing();
         int ret = device.Close();
         if (ret != MvError.MV_OK)
         {
@@ -301,15 +328,11 @@ public class HikCamera : ICamera
 
     public void Close()
     {
-        StopThread();
-        StopGrabbing();
         // ch:关闭设备 | en:Close device
         if (device == null) return;
-        int ret = device.Close();
-        if (ret != MvError.MV_OK)
-        {
-            Console.WriteLine("Close device failed:{0:x8}", ret);
-        }
+        StopThread();
+        if (device.IsConnected)
+            device.Close();
         device.Dispose();
         device = null;
     }
@@ -330,20 +353,9 @@ public class HikCamera : ICamera
     //    if (config.SerialNumber != this.SN)
     //        throw new ArgumentException("配置的序列号与相机不匹配");
     //}
-
-    public void Dispose()
-    {
-        if (device.IsConnected)
-        {
-            StopThread();
-            ((ICamera)this).Close();
-        }
-        Console.WriteLine($"海康相机 {SN} 已释放资源");
-    }
-
     #endregion
 
-    #region 海康相机特有方法
+    #region 内部方法
 
     #region 图像回调
     private void FrameGrabedEventHandler(object sender, FrameGrabbedEventArgs e)
@@ -355,11 +367,10 @@ public class HikCamera : ICamera
         {
             lock (this)
             {
-                if (_frameQueue.Count <= _maxQueueSize)
+                if (frameQueue.Count <= _maxQueueSize)
                 {
-                    //ch: 添加到队列并通知处理线程 | en: Add the frame to the queue and notify the processing thread
-                    _frameQueue.Enqueue(e.FrameOut);
-                    _frameGrabSem.Release();
+                    //ch: 添加到队列
+                    frameQueue.Enqueue(e.FrameOut);
                 }
             }
         }
@@ -371,67 +382,47 @@ public class HikCamera : ICamera
 
     void AsyncProcessThread()
     {
-
         while (!_processThreadExit)
         {
-            if (!_frameGrabSem.WaitOne(2)) continue;
             try
             {
-                using IFrameOut frame = _frameQueue.Dequeue();
-                var image = frame.Image;
-
-                MvGvspPixelType dstPixelType = MvGvspPixelType.PixelType_Gvsp_Undefined;
-
-                if (IsColorPixelFormat(image.PixelType))
+                lock (this)
                 {
-                    dstPixelType = MvGvspPixelType.PixelType_Gvsp_BGR8_Packed;
-                }
-                else if (IsMonoPixelFormat(image.PixelType))
-                {
-                    dstPixelType = MvGvspPixelType.PixelType_Gvsp_Mono8;
-                }
-                else
-                {
-                    Console.WriteLine("Don't need to convert!");
-                }
+                    _stopwatch.Restart();
+                    if (!frameQueue.TryDequeue(out var frame)) continue;
 
-                if (dstPixelType != MvGvspPixelType.PixelType_Gvsp_Undefined)
-                {
-                    // ch:像素格式转换 | en:Pixel type convert 
-                    int result = device.PixelTypeConverter.ConvertPixelType(image, out var outImage, dstPixelType);
-                    if (result != MvError.MV_OK)
-                    {
-                        Console.WriteLine("Image Convert failed:{0:x8}", result);
-                        continue;
-                    }
+                    var image = frame.Image;
 
+                    //var dstPixelType = IsMonoPixelFormat(image.PixelType) ? MvGvspPixelType.PixelType_Gvsp_Mono8 : MvGvspPixelType.PixelType_Gvsp_BGR8_Packed;
 
-                    if (outImage.PixelDataPtr == IntPtr.Zero)
-                    {
-                        continue;
-                    }
+                    //if (image.PixelType == MvGvspPixelType.PixelType_Gvsp_Undefined) continue;
+                    //// ch:像素格式转换 | en:Pixel type convert 
+                    //int result = device.PixelTypeConverter.ConvertPixelType(image, out var outImage, dstPixelType);
+                    //if (result != MvError.MV_OK)
+                    //{
+                    //    Console.WriteLine("Image Convert failed:{0:x8}", result);
+                    //    continue;
+                    //}
+                    //if (outImage.PixelDataPtr == IntPtr.Zero)
+                    //{
+                    //    continue;
+                    //}
 
-                    if (dstPixelType == MvGvspPixelType.PixelType_Gvsp_Mono8)
-                    {
-                        using var bitmap = outImage.ToBitmap();
-                        frameGrabedEvent?.Invoke(this, bitmap);
-                    }
-                    else
-                    {
-                        using var bitmap = outImage.ToBitmap();
-                        frameGrabedEvent?.Invoke(this, bitmap);
-                    }
+                    using var bitmap = image.ToBitmap();
+                    frameGrabedEvent?.Invoke(this, bitmap.Clone());
+                    _stopwatch.Stop();
 
-                    outImage.Dispose();
-                    //device.StreamGrabber.FreeImageBuffer(frame);
+                    image.Dispose();
+                    device.StreamGrabber.FreeImageBuffer(frame);
                     GC.Collect();
+                    Console.WriteLine("转换耗时:{0}", _stopwatch.ElapsedMilliseconds);
                 }
             }
-
             catch (Exception e)
             {
                 Console.WriteLine("AsyncProcessThread exception: " + e.Message);
             }
+            Thread.Sleep(2);
         }
     }
 
@@ -450,43 +441,6 @@ public class HikCamera : ICamera
         }
     }
 
-    private bool IsColorPixelFormat(MvGvspPixelType enType)
-    {
-        switch (enType)
-        {
-            case MvGvspPixelType.PixelType_Gvsp_BayerGR8:
-            case MvGvspPixelType.PixelType_Gvsp_BayerRG8:
-            case MvGvspPixelType.PixelType_Gvsp_BayerGB8:
-            case MvGvspPixelType.PixelType_Gvsp_BayerBG8:
-            case MvGvspPixelType.PixelType_Gvsp_BayerGR10_Packed:
-            case MvGvspPixelType.PixelType_Gvsp_BayerRG10_Packed:
-            case MvGvspPixelType.PixelType_Gvsp_BayerGB10_Packed:
-            case MvGvspPixelType.PixelType_Gvsp_BayerBG10_Packed:
-            case MvGvspPixelType.PixelType_Gvsp_BayerGR12_Packed:
-            case MvGvspPixelType.PixelType_Gvsp_BayerRG12_Packed:
-            case MvGvspPixelType.PixelType_Gvsp_BayerGB12_Packed:
-            case MvGvspPixelType.PixelType_Gvsp_BayerBG12_Packed:
-            case MvGvspPixelType.PixelType_Gvsp_BayerGR10:
-            case MvGvspPixelType.PixelType_Gvsp_BayerRG10:
-            case MvGvspPixelType.PixelType_Gvsp_BayerGB10:
-            case MvGvspPixelType.PixelType_Gvsp_BayerBG10:
-            case MvGvspPixelType.PixelType_Gvsp_BayerGR12:
-            case MvGvspPixelType.PixelType_Gvsp_BayerRG12:
-            case MvGvspPixelType.PixelType_Gvsp_BayerGB12:
-            case MvGvspPixelType.PixelType_Gvsp_BayerBG12:
-            case MvGvspPixelType.PixelType_Gvsp_YUV422_Packed:
-            case MvGvspPixelType.PixelType_Gvsp_YUV422_YUYV_Packed:
-            case MvGvspPixelType.PixelType_Gvsp_RGB8_Packed:
-            case MvGvspPixelType.PixelType_Gvsp_BGR8_Packed:
-            case MvGvspPixelType.PixelType_Gvsp_RGBA8_Packed:
-            case MvGvspPixelType.PixelType_Gvsp_BGRA8_Packed:
-                return true;
-            default:
-                return false;
-        }
-    }
-
-
     #endregion
 
 
@@ -495,8 +449,15 @@ public class HikCamera : ICamera
     {
         if (e.MsgType == DeviceExceptionType.DisConnect)
         {
+            DisConnetEvent?.Invoke(this,true);
             Console.WriteLine($"[{SN}]Device disconnect!");
             StopThread();
+            if (device != null)
+            {
+                device.Close();
+                device.Dispose();
+                device = null;
+            }
             ReconnectThread = new Thread(ReconnectProcess) { IsBackground = true };
             ReconnectThread.Start();
         }
@@ -504,12 +465,19 @@ public class HikCamera : ICamera
 
     private void ReconnectProcess()
     {
-        while (!device.IsConnected)
+        while (!IsConnected)
         {
             if (Open() == MvError.MV_OK)
             {
+                DisConnetEvent?.Invoke(this, false);
                 Console.WriteLine($"[{SN}]相机重连成功");
                 break;
+            }
+            if (device != null)
+            {
+                device.Close();
+                device.Dispose();
+                device = null;
             }
             Thread.Sleep(3000);
         }
@@ -520,6 +488,8 @@ public class HikCamera : ICamera
     {
         try
         {
+            device.StreamGrabber.FrameGrabedEvent -= FrameGrabedEventHandler;
+            device.DeviceExceptionEvent -= ExceptionEventHandler;
             //ch: 通知异步处理线程退出 | en: Notify the thread to exit
             _processThreadExit = true;
             _asyncProcessThread.Join();

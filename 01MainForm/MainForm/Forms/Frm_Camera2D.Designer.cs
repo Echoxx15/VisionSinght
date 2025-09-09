@@ -7,18 +7,18 @@
         /// </summary>
         private System.ComponentModel.IContainer components = null;
 
-        /// <summary>
-        /// Clean up any resources being used.
-        /// </summary>
-        /// <param name="disposing">true if managed resources should be disposed; otherwise, false.</param>
-        protected override void Dispose(bool disposing)
-        {
-            if (disposing && (components != null))
-            {
-                components.Dispose();
-            }
-            base.Dispose(disposing);
-        }
+        ///// <summary>
+        ///// Clean up any resources being used.
+        ///// </summary>
+        ///// <param name="disposing">true if managed resources should be disposed; otherwise, false.</param>
+        //protected override void Dispose(bool disposing)
+        //{
+        //    if (disposing && (components != null))
+        //    {
+        //        components.Dispose();
+        //    }
+        //    base.Dispose(disposing);
+        //}
 
         #region Windows Form Designer generated code
 
@@ -30,13 +30,15 @@
         {
             this.components = new System.ComponentModel.Container();
             System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(Frm_Camera2D));
+            System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle1 = new System.Windows.Forms.DataGridViewCellStyle();
+            System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle2 = new System.Windows.Forms.DataGridViewCellStyle();
             this.tabPanel_Main = new DevExpress.Utils.Layout.TablePanel();
             this.split_Display = new DevExpress.XtraEditors.SplitContainerControl();
             this.tablePanel1 = new DevExpress.Utils.Layout.TablePanel();
             this.panelControl1 = new DevExpress.XtraEditors.PanelControl();
             this.btn_Continuous = new DevExpress.XtraEditors.SimpleButton();
             this.btn_TriggerOnce = new DevExpress.XtraEditors.SimpleButton();
-            this.btn_Close = new DevExpress.XtraEditors.SimpleButton();
+            this.btn_DisConnect = new DevExpress.XtraEditors.SimpleButton();
             this.btn_Connect = new DevExpress.XtraEditors.SimpleButton();
             this.panelControl3 = new DevExpress.XtraEditors.PanelControl();
             this.panelControl2 = new DevExpress.XtraEditors.PanelControl();
@@ -56,11 +58,16 @@
             this.labelControl2 = new DevExpress.XtraEditors.LabelControl();
             this.Txt_Sn = new DevExpress.XtraEditors.TextEdit();
             this.pnl_DevInfo = new DevExpress.XtraEditors.PanelControl();
+            this.btn_Remove = new DevExpress.XtraEditors.SimpleButton();
+            this.btn_Add = new DevExpress.XtraEditors.SimpleButton();
             this.labelControl10 = new DevExpress.XtraEditors.LabelControl();
             this.cmb_SnList = new DevExpress.XtraEditors.ComboBoxEdit();
             this.labelControl6 = new DevExpress.XtraEditors.LabelControl();
             this.cmb_Manufacturers = new DevExpress.XtraEditors.ComboBoxEdit();
             this.user_ShowDisplay = new Cognex.VisionPro.Display.CogDisplay();
+            this.dgv_CameraConfig = new System.Windows.Forms.DataGridView();
+            this.col_Sn = new System.Windows.Forms.DataGridViewTextBoxColumn();
+            this.col_Expain = new System.Windows.Forms.DataGridViewTextBoxColumn();
             ((System.ComponentModel.ISupportInitialize)(this.tabPanel_Main)).BeginInit();
             this.tabPanel_Main.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.split_Display)).BeginInit();
@@ -74,6 +81,7 @@
             ((System.ComponentModel.ISupportInitialize)(this.panelControl1)).BeginInit();
             this.panelControl1.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.panelControl3)).BeginInit();
+            this.panelControl3.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.panelControl2)).BeginInit();
             this.panelControl2.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.cmb_TriggerSource.Properties)).BeginInit();
@@ -86,6 +94,7 @@
             ((System.ComponentModel.ISupportInitialize)(this.cmb_SnList.Properties)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.cmb_Manufacturers.Properties)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.user_ShowDisplay)).BeginInit();
+            ((System.ComponentModel.ISupportInitialize)(this.dgv_CameraConfig)).BeginInit();
             this.SuspendLayout();
             // 
             // tabPanel_Main
@@ -158,7 +167,7 @@
             this.tablePanel1.SetColumn(this.panelControl1, 0);
             this.panelControl1.Controls.Add(this.btn_Continuous);
             this.panelControl1.Controls.Add(this.btn_TriggerOnce);
-            this.panelControl1.Controls.Add(this.btn_Close);
+            this.panelControl1.Controls.Add(this.btn_DisConnect);
             this.panelControl1.Controls.Add(this.btn_Connect);
             this.panelControl1.Dock = System.Windows.Forms.DockStyle.Fill;
             this.panelControl1.Location = new System.Drawing.Point(19, 581);
@@ -191,17 +200,17 @@
             this.btn_TriggerOnce.Text = "软触发一次";
             this.btn_TriggerOnce.Click += new System.EventHandler(this.btn_TriggerOnce_Click);
             // 
-            // btn_Close
+            // btn_DisConnect
             // 
-            this.btn_Close.Appearance.BackColor = System.Drawing.Color.SlateBlue;
-            this.btn_Close.Appearance.Options.UseBackColor = true;
-            this.btn_Close.Cursor = System.Windows.Forms.Cursors.Hand;
-            this.btn_Close.Location = new System.Drawing.Point(157, 21);
-            this.btn_Close.Name = "btn_Close";
-            this.btn_Close.Size = new System.Drawing.Size(112, 34);
-            this.btn_Close.TabIndex = 1;
-            this.btn_Close.Text = "断开";
-            this.btn_Close.Click += new System.EventHandler(this.btn_Close_Click);
+            this.btn_DisConnect.Appearance.BackColor = System.Drawing.Color.SlateBlue;
+            this.btn_DisConnect.Appearance.Options.UseBackColor = true;
+            this.btn_DisConnect.Cursor = System.Windows.Forms.Cursors.Hand;
+            this.btn_DisConnect.Location = new System.Drawing.Point(157, 21);
+            this.btn_DisConnect.Name = "btn_DisConnect";
+            this.btn_DisConnect.Size = new System.Drawing.Size(112, 34);
+            this.btn_DisConnect.TabIndex = 1;
+            this.btn_DisConnect.Text = "断开";
+            this.btn_DisConnect.Click += new System.EventHandler(this.btn_DisConnect_Click);
             // 
             // btn_Connect
             // 
@@ -221,6 +230,7 @@
             this.panelControl3.Appearance.Options.UseBackColor = true;
             this.panelControl3.BorderStyle = DevExpress.XtraEditors.Controls.BorderStyles.NoBorder;
             this.tablePanel1.SetColumn(this.panelControl3, 0);
+            this.panelControl3.Controls.Add(this.dgv_CameraConfig);
             this.panelControl3.Dock = System.Windows.Forms.DockStyle.Fill;
             this.panelControl3.Location = new System.Drawing.Point(19, 149);
             this.panelControl3.Name = "panelControl3";
@@ -327,7 +337,7 @@
             this.chk_HardTrigger.Properties.Caption = "硬触发";
             this.chk_HardTrigger.Size = new System.Drawing.Size(92, 27);
             this.chk_HardTrigger.TabIndex = 14;
-            this.chk_HardTrigger.CheckedChanged += new System.EventHandler(this.chk_Hard_CheckedChanged);
+            this.chk_HardTrigger.CheckedChanged += new System.EventHandler(this.chk_HardTrigger_CheckedChanged);
             // 
             // txt_MaxGain
             // 
@@ -466,6 +476,8 @@
             this.pnl_DevInfo.Appearance.Options.UseBackColor = true;
             this.pnl_DevInfo.BorderStyle = DevExpress.XtraEditors.Controls.BorderStyles.NoBorder;
             this.tablePanel1.SetColumn(this.pnl_DevInfo, 0);
+            this.pnl_DevInfo.Controls.Add(this.btn_Remove);
+            this.pnl_DevInfo.Controls.Add(this.btn_Add);
             this.pnl_DevInfo.Controls.Add(this.labelControl10);
             this.pnl_DevInfo.Controls.Add(this.cmb_SnList);
             this.pnl_DevInfo.Controls.Add(this.labelControl6);
@@ -476,6 +488,38 @@
             this.tablePanel1.SetRow(this.pnl_DevInfo, 0);
             this.pnl_DevInfo.Size = new System.Drawing.Size(583, 125);
             this.pnl_DevInfo.TabIndex = 3;
+            // 
+            // btn_Remove
+            // 
+            this.btn_Remove.Appearance.BackColor = System.Drawing.Color.SlateBlue;
+            this.btn_Remove.Appearance.ForeColor = System.Drawing.Color.SlateBlue;
+            this.btn_Remove.Appearance.Options.UseBackColor = true;
+            this.btn_Remove.Appearance.Options.UseForeColor = true;
+            this.btn_Remove.Cursor = System.Windows.Forms.Cursors.Hand;
+            this.btn_Remove.ImageOptions.Image = ((System.Drawing.Image)(resources.GetObject("btn_Remove.ImageOptions.Image")));
+            this.btn_Remove.ImeMode = System.Windows.Forms.ImeMode.NoControl;
+            this.btn_Remove.Location = new System.Drawing.Point(413, 62);
+            this.btn_Remove.Name = "btn_Remove";
+            this.btn_Remove.Size = new System.Drawing.Size(40, 34);
+            this.btn_Remove.TabIndex = 10;
+            this.btn_Remove.ToolTip = "删除相机";
+            this.btn_Remove.Click += new System.EventHandler(this.btn_Remove_Click);
+            // 
+            // btn_Add
+            // 
+            this.btn_Add.Appearance.BackColor = System.Drawing.Color.SlateBlue;
+            this.btn_Add.Appearance.ForeColor = System.Drawing.Color.SlateBlue;
+            this.btn_Add.Appearance.Options.UseBackColor = true;
+            this.btn_Add.Appearance.Options.UseForeColor = true;
+            this.btn_Add.Cursor = System.Windows.Forms.Cursors.Hand;
+            this.btn_Add.ImageOptions.Image = ((System.Drawing.Image)(resources.GetObject("btn_Add.ImageOptions.Image")));
+            this.btn_Add.ImeMode = System.Windows.Forms.ImeMode.NoControl;
+            this.btn_Add.Location = new System.Drawing.Point(358, 62);
+            this.btn_Add.Name = "btn_Add";
+            this.btn_Add.Size = new System.Drawing.Size(40, 34);
+            this.btn_Add.TabIndex = 9;
+            this.btn_Add.ToolTip = "添加相机";
+            this.btn_Add.Click += new System.EventHandler(this.btn_Add_Click);
             // 
             // labelControl10
             // 
@@ -500,7 +544,6 @@
             new DevExpress.XtraEditors.Controls.EditorButton(DevExpress.XtraEditors.Controls.ButtonPredefines.Combo)});
             this.cmb_SnList.Properties.DropDownRows = 20;
             this.cmb_SnList.Properties.PopupSizeable = true;
-            this.cmb_SnList.Properties.TextEditStyle = DevExpress.XtraEditors.Controls.TextEditStyles.DisableTextEditor;
             this.cmb_SnList.Size = new System.Drawing.Size(238, 28);
             this.cmb_SnList.TabIndex = 8;
             this.cmb_SnList.SelectedIndexChanged += new System.EventHandler(this.cmb_SnList_SelectedIndexChanged);
@@ -526,9 +569,8 @@
             this.cmb_Manufacturers.Properties.Appearance.Options.UseForeColor = true;
             this.cmb_Manufacturers.Properties.Buttons.AddRange(new DevExpress.XtraEditors.Controls.EditorButton[] {
             new DevExpress.XtraEditors.Controls.EditorButton(DevExpress.XtraEditors.Controls.ButtonPredefines.Combo)});
-            this.cmb_Manufacturers.Properties.DropDownRows = 20;
+            this.cmb_Manufacturers.Properties.DropDownRows = 10;
             this.cmb_Manufacturers.Properties.PopupSizeable = true;
-            this.cmb_Manufacturers.Properties.TextEditStyle = DevExpress.XtraEditors.Controls.TextEditStyles.DisableTextEditor;
             this.cmb_Manufacturers.Size = new System.Drawing.Size(238, 28);
             this.cmb_Manufacturers.TabIndex = 6;
             this.cmb_Manufacturers.SelectedIndexChanged += new System.EventHandler(this.cmb_Manufacturers_SelectedIndexChanged);
@@ -549,7 +591,62 @@
             this.user_ShowDisplay.Name = "user_ShowDisplay";
             this.user_ShowDisplay.OcxState = ((System.Windows.Forms.AxHost.State)(resources.GetObject("user_ShowDisplay.OcxState")));
             this.user_ShowDisplay.Size = new System.Drawing.Size(737, 683);
-            this.user_ShowDisplay.TabIndex = 0;
+            this.user_ShowDisplay.TabIndex = 1;
+            // 
+            // dgv_CameraConfig
+            // 
+            this.dgv_CameraConfig.AllowUserToDeleteRows = false;
+            this.dgv_CameraConfig.AllowUserToResizeRows = false;
+            this.dgv_CameraConfig.BackgroundColor = System.Drawing.Color.Black;
+            this.dgv_CameraConfig.BorderStyle = System.Windows.Forms.BorderStyle.Fixed3D;
+            dataGridViewCellStyle1.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleLeft;
+            dataGridViewCellStyle1.BackColor = System.Drawing.Color.Black;
+            dataGridViewCellStyle1.Font = new System.Drawing.Font("Tahoma", 9F);
+            dataGridViewCellStyle1.ForeColor = System.Drawing.Color.White;
+            dataGridViewCellStyle1.SelectionBackColor = System.Drawing.SystemColors.Highlight;
+            dataGridViewCellStyle1.SelectionForeColor = System.Drawing.SystemColors.HighlightText;
+            dataGridViewCellStyle1.WrapMode = System.Windows.Forms.DataGridViewTriState.True;
+            this.dgv_CameraConfig.ColumnHeadersDefaultCellStyle = dataGridViewCellStyle1;
+            this.dgv_CameraConfig.ColumnHeadersHeightSizeMode = System.Windows.Forms.DataGridViewColumnHeadersHeightSizeMode.AutoSize;
+            this.dgv_CameraConfig.Columns.AddRange(new System.Windows.Forms.DataGridViewColumn[] {
+            this.col_Sn,
+            this.col_Expain});
+            this.dgv_CameraConfig.Cursor = System.Windows.Forms.Cursors.Hand;
+            dataGridViewCellStyle2.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleLeft;
+            dataGridViewCellStyle2.BackColor = System.Drawing.Color.Black;
+            dataGridViewCellStyle2.Font = new System.Drawing.Font("Tahoma", 9F);
+            dataGridViewCellStyle2.ForeColor = System.Drawing.Color.White;
+            dataGridViewCellStyle2.SelectionBackColor = System.Drawing.SystemColors.Highlight;
+            dataGridViewCellStyle2.SelectionForeColor = System.Drawing.SystemColors.HighlightText;
+            dataGridViewCellStyle2.WrapMode = System.Windows.Forms.DataGridViewTriState.False;
+            this.dgv_CameraConfig.DefaultCellStyle = dataGridViewCellStyle2;
+            this.dgv_CameraConfig.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.dgv_CameraConfig.GridColor = System.Drawing.Color.Black;
+            this.dgv_CameraConfig.Location = new System.Drawing.Point(0, 0);
+            this.dgv_CameraConfig.Name = "dgv_CameraConfig";
+            this.dgv_CameraConfig.RowHeadersVisible = false;
+            this.dgv_CameraConfig.RowHeadersWidth = 62;
+            this.dgv_CameraConfig.RowTemplate.Height = 30;
+            this.dgv_CameraConfig.Size = new System.Drawing.Size(583, 201);
+            this.dgv_CameraConfig.TabIndex = 0;
+            // 
+            // col_Sn
+            // 
+            this.col_Sn.HeaderText = "序列号";
+            this.col_Sn.MinimumWidth = 8;
+            this.col_Sn.Name = "col_Sn";
+            this.col_Sn.ReadOnly = true;
+            this.col_Sn.SortMode = System.Windows.Forms.DataGridViewColumnSortMode.NotSortable;
+            this.col_Sn.Width = 250;
+            // 
+            // col_Expain
+            // 
+            this.col_Expain.AutoSizeMode = System.Windows.Forms.DataGridViewAutoSizeColumnMode.Fill;
+            this.col_Expain.HeaderText = "备注";
+            this.col_Expain.MinimumWidth = 8;
+            this.col_Expain.Name = "col_Expain";
+            this.col_Expain.SortMode = System.Windows.Forms.DataGridViewColumnSortMode.NotSortable;
+            this.col_Expain.ToolTipText = "自定义设备名称";
             // 
             // Frm_Camera2D
             // 
@@ -558,7 +655,8 @@
             this.ClientSize = new System.Drawing.Size(1412, 715);
             this.Controls.Add(this.tabPanel_Main);
             this.Name = "Frm_Camera2D";
-            this.Text = "Frm_Camera2D";
+            this.StartPosition = System.Windows.Forms.FormStartPosition.CenterScreen;
+            this.Text = "相机配置界面";
             this.Load += new System.EventHandler(this.Frm_Camera2D_Load);
             ((System.ComponentModel.ISupportInitialize)(this.tabPanel_Main)).EndInit();
             this.tabPanel_Main.ResumeLayout(false);
@@ -574,6 +672,7 @@
             ((System.ComponentModel.ISupportInitialize)(this.panelControl1)).EndInit();
             this.panelControl1.ResumeLayout(false);
             ((System.ComponentModel.ISupportInitialize)(this.panelControl3)).EndInit();
+            this.panelControl3.ResumeLayout(false);
             ((System.ComponentModel.ISupportInitialize)(this.panelControl2)).EndInit();
             this.panelControl2.ResumeLayout(false);
             this.panelControl2.PerformLayout();
@@ -588,6 +687,7 @@
             ((System.ComponentModel.ISupportInitialize)(this.cmb_SnList.Properties)).EndInit();
             ((System.ComponentModel.ISupportInitialize)(this.cmb_Manufacturers.Properties)).EndInit();
             ((System.ComponentModel.ISupportInitialize)(this.user_ShowDisplay)).EndInit();
+            ((System.ComponentModel.ISupportInitialize)(this.dgv_CameraConfig)).EndInit();
             this.ResumeLayout(false);
 
         }
@@ -600,7 +700,7 @@
         private DevExpress.XtraEditors.PanelControl panelControl1;
         private DevExpress.XtraEditors.SimpleButton btn_Continuous;
         private DevExpress.XtraEditors.SimpleButton btn_TriggerOnce;
-        private DevExpress.XtraEditors.SimpleButton btn_Close;
+        private DevExpress.XtraEditors.SimpleButton btn_DisConnect;
         private DevExpress.XtraEditors.SimpleButton btn_Connect;
         private DevExpress.XtraEditors.PanelControl panelControl3;
         private DevExpress.XtraEditors.PanelControl panelControl2;
@@ -625,5 +725,10 @@
         private DevExpress.XtraEditors.LabelControl labelControl6;
         private DevExpress.XtraEditors.ComboBoxEdit cmb_Manufacturers;
         private Cognex.VisionPro.Display.CogDisplay user_ShowDisplay;
+        private DevExpress.XtraEditors.SimpleButton btn_Add;
+        private DevExpress.XtraEditors.SimpleButton btn_Remove;
+        private System.Windows.Forms.DataGridView dgv_CameraConfig;
+        private System.Windows.Forms.DataGridViewTextBoxColumn col_Sn;
+        private System.Windows.Forms.DataGridViewTextBoxColumn col_Expain;
     }
 }

@@ -27,7 +27,7 @@ public sealed class CameraManager
     /// </summary>
     private readonly ConcurrentDictionary<string,ICamera> gCameraList = new();
     /// <summary>
-    /// 枚举创建的相机列表
+    /// 管理已连接的相机列表
     /// </summary>
     private readonly ConcurrentDictionary<string, ICamera> temCameraList = new();
     /// <summary>
@@ -334,6 +334,14 @@ public sealed class CameraManager
         {
             _userCameraConfigs.TryGetValue(serialNumber, out var config);
             return config;
+        }
+    }
+
+    public void UnInitialize()
+    {
+        foreach (var item in temCameraList)
+        {
+            item.Value.Close();
         }
     }
 }
