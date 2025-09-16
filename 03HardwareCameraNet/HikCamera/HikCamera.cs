@@ -7,7 +7,7 @@ using System.Threading;
 using MvCameraControl;
 using IParameters = HardwareCameraNet.IParameters;
 
-namespace HikCameraPlugin;
+namespace HikCamera;
 
 /// <summary>
 /// 海康相机实现类

@@ -1,15 +1,15 @@
 ﻿using System;
-using System.Collections.Generic;
-using MVSDK_Net;
 using System.Collections.Concurrent;
+using System.Collections.Generic;
+using System.Diagnostics;
 using System.Drawing;
 using System.Drawing.Imaging;
 using System.Linq;
 using System.Runtime.InteropServices;
 using System.Threading;
-using System.Diagnostics;
+using MVSDK_Net;
 
-namespace iRAYPLECameraPlugin;
+namespace iRAYPLECamera;
 
 public class IRAYPLECamera : IDevice2D
 {

@@ -24,9 +24,9 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MainForm", "01MainForm\Main
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "HardwareCameraNet", "03HardwareCameraNet\HardwareCameraNet\HardwareCameraNet.csproj", "{02D11C38-CC51-4BA5-AC42-C5091B86ABBB}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "HikCameraPlugin", "03HardwareCameraNet\HikCameraPlugin\HikCameraPlugin.csproj", "{72372FEE-826B-42F8-9B33-1D4A9646DEFC}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "HikCamera", "03HardwareCameraNet\HikCamera\HikCamera.csproj", "{72372FEE-826B-42F8-9B33-1D4A9646DEFC}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "iRAYPLECameraPlugin", "03HardwareCameraNet\iRAYPLECameraPlugin\iRAYPLECameraPlugin.csproj", "{73EC26B7-5E9A-4D72-8369-8A3AAB822AAB}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "iRAYPLECamera", "03HardwareCameraNet\iRAYPLECamera\iRAYPLECamera.csproj", "{73EC26B7-5E9A-4D72-8369-8A3AAB822AAB}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CameraCapture2D", "02Plugins\CameraCapture2D\CameraCapture2D.csproj", "{D954286D-A6F8-4D27-8B6B-513B7E341CA1}"
 EndProject

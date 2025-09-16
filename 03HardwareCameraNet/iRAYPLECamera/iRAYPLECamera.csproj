@@ -4,11 +4,11 @@
   <PropertyGroup>
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
     <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
-    <ProjectGuid>{72372FEE-826B-42F8-9B33-1D4A9646DEFC}</ProjectGuid>
+    <ProjectGuid>{73EC26B7-5E9A-4D72-8369-8A3AAB822AAB}</ProjectGuid>
     <OutputType>Library</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>HikCameraPlugin</RootNamespace>
-    <AssemblyName>HikCameraPlugin</AssemblyName>
+    <RootNamespace>iRAYPLECamera</RootNamespace>
+    <AssemblyName>iRAYPLECamera</AssemblyName>
     <TargetFrameworkVersion>v4.8.1</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
     <Deterministic>true</Deterministic>
@@ -33,16 +33,15 @@
     <LangVersion>latest</LangVersion>
   </PropertyGroup>
   <ItemGroup>
-    <Reference Include="MvCameraControl.Net, Version=3.4.0.1, Culture=neutral, PublicKeyToken=52fddfb3f94be800, processorArchitecture=MSIL">
-      <SpecificVersion>False</SpecificVersion>
-      <HintPath>C:\Program Files (x86)\MVS\Development\DotNet\AnyCpu\net40\MvCameraControl.Net.dll</HintPath>
+    <Reference Include="MVSDK_Net">
+      <HintPath>C:\Program Files\HuarayTech\MV Viewer\Development\DOTNET DLL\IMV\DOTNET_4.0\AnyCpu\MVSDK_Net.dll</HintPath>
     </Reference>
     <Reference Include="System" />
     <Reference Include="System.Core" />
     <Reference Include="System.Drawing" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="HikCamera.cs" />
+    <Compile Include="IRAYPLECamera.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>
@@ -50,7 +49,7 @@
       <Project>{c1ec5193-9ae2-486b-a80f-e0cabc76993e}</Project>
       <Name>VisionCore</Name>
     </ProjectReference>
-    <ProjectReference Include="..\CameraInterface\HardwareCameraNet.csproj">
+    <ProjectReference Include="..\HardwareCameraNet\HardwareCameraNet.csproj">
       <Project>{02d11c38-cc51-4ba5-ac42-c5091b86abbb}</Project>
       <Name>HardwareCameraNet</Name>
     </ProjectReference>
