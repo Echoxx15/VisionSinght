@@ -22,7 +22,7 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MainForm", "01MainForm\Main
 		{72372FEE-826B-42F8-9B33-1D4A9646DEFC} = {72372FEE-826B-42F8-9B33-1D4A9646DEFC}
 	EndProjectSection
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "HardwareCameraNet", "03HardwareCameraNet\CameraInterface\HardwareCameraNet.csproj", "{02D11C38-CC51-4BA5-AC42-C5091B86ABBB}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "HardwareCameraNet", "03HardwareCameraNet\HardwareCameraNet\HardwareCameraNet.csproj", "{02D11C38-CC51-4BA5-AC42-C5091B86ABBB}"
 	ProjectSection(ProjectDependencies) = postProject
 		{C1EC5193-9AE2-486B-A80F-E0CABC76993E} = {C1EC5193-9AE2-486B-A80F-E0CABC76993E}
 	EndProjectSection
