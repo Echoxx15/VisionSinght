@@ -23,9 +23,6 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MainForm", "01MainForm\Main
 	EndProjectSection
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "HardwareCameraNet", "03HardwareCameraNet\HardwareCameraNet\HardwareCameraNet.csproj", "{02D11C38-CC51-4BA5-AC42-C5091B86ABBB}"
-	ProjectSection(ProjectDependencies) = postProject
-		{C1EC5193-9AE2-486B-A80F-E0CABC76993E} = {C1EC5193-9AE2-486B-A80F-E0CABC76993E}
-	EndProjectSection
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "HikCameraPlugin", "03HardwareCameraNet\HikCameraPlugin\HikCameraPlugin.csproj", "{72372FEE-826B-42F8-9B33-1D4A9646DEFC}"
 EndProject

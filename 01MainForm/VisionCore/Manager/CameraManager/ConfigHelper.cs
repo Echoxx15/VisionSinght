@@ -4,7 +4,7 @@ using System.IO;
 using System.Linq;
 using System.Xml.Serialization;
 
-namespace HardwareCameraNet;
+namespace VisionCore.Manager.CameraManager;
 
 /// <summary>
 /// 通用配置工具（XML序列化/反序列化）

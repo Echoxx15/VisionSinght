@@ -1,6 +1,4 @@
-﻿using System;
-using System.Windows.Forms;
-using HardwareCameraNet;
+﻿using System.Windows.Forms;
 
 namespace MainForm.Forms;
 

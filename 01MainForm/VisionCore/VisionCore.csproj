@@ -71,7 +71,9 @@
     <Compile Include="Frm_Solution\TreeToolBar.Designer.cs">
       <DependentUpon>TreeToolBar.cs</DependentUpon>
     </Compile>
+    <Compile Include="Manager\CameraManager\CameraConfig.cs" />
     <Compile Include="Manager\CameraManager\CameraManager.cs" />
+    <Compile Include="Manager\CameraManager\ConfigHelper.cs" />
     <Compile Include="Manager\PluginManager\PluginManager.cs" />
     <Compile Include="PluginBase\Frm_ToolBase.cs">
       <SubType>Form</SubType>
@@ -79,8 +81,7 @@
     <Compile Include="PluginBase\Frm_ToolBase.Designer.cs">
       <DependentUpon>Frm_ToolBase.cs</DependentUpon>
     </Compile>
-    <Compile Include="PluginBase\IPlugin.cs" />
-    <Compile Include="PluginBase\PluginLoader.cs" />
+    <Compile Include="PluginBase\PluginInfo.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Properties\Resources.Designer.cs">
       <AutoGen>True</AutoGen>
@@ -106,6 +107,12 @@
       <Generator>ResXFileCodeGenerator</Generator>
       <LastGenOutput>Resources.Designer.cs</LastGenOutput>
     </EmbeddedResource>
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\..\03HardwareCameraNet\HardwareCameraNet\HardwareCameraNet.csproj">
+      <Project>{02d11c38-cc51-4ba5-ac42-c5091b86abbb}</Project>
+      <Name>HardwareCameraNet</Name>
+    </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>
