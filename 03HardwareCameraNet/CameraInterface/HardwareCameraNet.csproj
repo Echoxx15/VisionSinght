@@ -49,12 +49,13 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="CameraConfig.cs" />
-    <Compile Include="CameraManager.cs" />
-    <Compile Include="CameraManufacturerAttribute.cs" />
+    <Compile Include="DeviceFactory.cs" />
+    <Compile Include="IDevice2D.cs" />
     <Compile Include="ConfigHelper.cs" />
     <Compile Include="ICamera.cs" />
-    <Compile Include="IValue\IImpl.cs" />
-    <Compile Include="IValue\IValue.cs" />
+    <Compile Include="IInterfaceCL.cs" />
+    <Compile Include="IParameters.cs" />
+    <Compile Include="PluginLoader.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>

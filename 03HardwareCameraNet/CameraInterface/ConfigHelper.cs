@@ -9,7 +9,7 @@ namespace HardwareCameraNet;
 /// <summary>
 /// 通用配置工具（XML序列化/反序列化）
 /// </summary>
-public static class ConfigHelper
+internal static class ConfigHelper
 {
     /// <summary>
     /// 保存配置到本地XML文件

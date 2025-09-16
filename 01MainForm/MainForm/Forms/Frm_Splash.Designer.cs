@@ -1,6 +1,6 @@
 ﻿using System.Windows.Forms;
 
-namespace VisionSight;
+namespace MainForm.Forms;
 partial class Frm_Splash
 {
     /// <summary>
@@ -31,6 +31,7 @@ partial class Frm_Splash
     {
             System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(Frm_Splash));
             this.lbl_Splash = new System.Windows.Forms.Label();
+            this.progressBar1 = new System.Windows.Forms.ProgressBar();
             this.SuspendLayout();
             // 
             // lbl_Splash
@@ -46,6 +47,13 @@ partial class Frm_Splash
             this.lbl_Splash.TabIndex = 0;
             this.lbl_Splash.Text = "视觉系统启动中……";
             // 
+            // progressBar1
+            // 
+            this.progressBar1.Location = new System.Drawing.Point(284, 425);
+            this.progressBar1.Name = "progressBar1";
+            this.progressBar1.Size = new System.Drawing.Size(100, 23);
+            this.progressBar1.TabIndex = 1;
+            // 
             // Frm_Splash
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(9F, 18F);
@@ -54,6 +62,7 @@ partial class Frm_Splash
             this.BackgroundImageLayout = System.Windows.Forms.ImageLayout.Stretch;
             this.ClientSize = new System.Drawing.Size(795, 568);
             this.ControlBox = false;
+            this.Controls.Add(this.progressBar1);
             this.Controls.Add(this.lbl_Splash);
             this.Cursor = System.Windows.Forms.Cursors.AppStarting;
             this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.None;
@@ -71,4 +80,5 @@ partial class Frm_Splash
     #endregion
 
     public Label lbl_Splash;
+    private ProgressBar progressBar1;
 }

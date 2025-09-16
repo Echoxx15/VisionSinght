@@ -5,22 +5,16 @@ using System.Diagnostics;
 using System.Linq;
 using System.Threading;
 using HardwareCameraNet;
-using HardwareCameraNet.IValue;
 using MvCameraControl;
+using IParameters = HardwareCameraNet.IParameters;
 
 namespace HikCameraPlugin;
 
 /// <summary>
 /// 海康相机实现类
 /// </summary>
-// 标记支持的品牌名称
-[CameraManufacturer("海康面阵相机")]
-public class HikCamera : ICamera
+public class HikCamera : IDevice2D
 {
-    public string PluginId => "Hikrobot";
-    public Version Version => new Version("1.0.0");
-    public string Description => "海康面阵相机系列";
-
     /// <summary>
     /// 海康支持的设备类型
     /// </summary>
@@ -29,6 +23,8 @@ public class HikCamera : ICamera
 
 
     #region ICamera接口属性
+    public string Manufacturer => "海康面阵相机";
+
     // 图像回调事件（需显式实现事件添加/移除逻辑，确保线程安全）
     private event EventHandler<object> frameGrabedEvent;
     public event EventHandler<object> FrameGrabedEvent
@@ -37,11 +33,13 @@ public class HikCamera : ICamera
         remove => frameGrabedEvent -= value;
     }
     public event EventHandler<object> DisConnetEvent;
-    public string SN { get; }
+    public string SN { get; } 
 
-    public bool IsConnected => device is { IsConnected: true };
+    public bool IsConnected { get; private set; }
+    public IParameters Parameters { get; }
 
     #endregion
+
 
     #region 相机属性
     // 相机特有属性
@@ -76,7 +74,11 @@ public class HikCamera : ICamera
     public HikCamera(string sn)
     {
         SN = sn ?? throw new ArgumentNullException(nameof(sn));
+        // 初始化海康相机的参数实现类
+        Parameters = new HikParameters(this);
     }
+
+
     #endregion
 
     #region 静态枚举方法
@@ -120,7 +122,7 @@ public class HikCamera : ICamera
             foreach (var devInfo in devInfoList)
             {
                 if (SN != devInfo.SerialNumber) continue;
-                device = DeviceFactory.CreateDevice(devInfo);
+                device = MvCameraControl.DeviceFactory.CreateDevice(devInfo);
                 ret = device.Open();
                 if (ret != MvError.MV_OK)
                 {
@@ -130,7 +132,11 @@ public class HikCamera : ICamera
                 break;
             }
 
-            //if (!gDeviceInfos.TryGetValue(SN, out var info)) return -1;
+            if (device == null)
+            {
+                Console.WriteLine("device Not Exist");
+                return -1;
+            }
 
             //device = DeviceFactory.CreateDevice(info);
 
@@ -178,6 +184,8 @@ public class HikCamera : ICamera
             {
                 return ret;
             }
+
+            IsConnected = true;
             Console.WriteLine("Open device Success:{0:x8}", ret);
             return MvError.MV_OK;
         }
@@ -188,88 +196,9 @@ public class HikCamera : ICamera
         }
     }
 
-    public IFloatVal GetExposureTime()
-    {
-        if (device.Parameters.GetFloatValue("ExposureTime", out var val) != MvError.MV_OK) return null;
-
-        var floatVal = new FloatValImpl(
-            curValue: Convert.ToDouble(val.CurValue),
-            max: Convert.ToDouble(val.Max),
-            min: Convert.ToDouble(val.Min)
-        );
-
-        return floatVal;
-    }
-
-    public void SetExposureTime(double val)
-    {
-        try
-        {
-            device.Parameters.SetEnumValue("ExposureAuto", 0u);
-            device.Parameters.SetFloatValue("ExposureTime", (float)val);
-        }
-        catch (Exception)
-        {
-            // ignored
-        }
-    }
-
-    public IFloatVal GetGain()
-    {
-        if (device.Parameters.GetFloatValue("Gain", out var val) != MvError.MV_OK) return null;
-
-        var floatVal = new FloatValImpl(
-            curValue: Convert.ToDouble(val.CurValue),
-            max: Convert.ToDouble(val.Max),
-            min: Convert.ToDouble(val.Min)
-        );
-
-        return floatVal;
-    }
-    public void SetGain(double val)
-    {
-        try
-        {
-            device.Parameters.SetEnumValue("GainAuto", 0u);
-            device.Parameters.SetFloatValue("Gain", (float)val);
-        }
-        catch (Exception)
-        {
-            // ignored
-        }
-    }
-
-    public void SetSoftwareTrigger()
-    {
-        device.Parameters.SetEnumValueByString("TriggerMode", "On");
-        device.Parameters.SetEnumValueByString("TriggerSource", "Software");
-    }
-    public void SetTriggerSource(string triggerSource)
-    {
-        device.Parameters.SetEnumValueByString("TriggerMode", "On");
-        device.Parameters.SetEnumValueByString("TriggerSource", triggerSource);
-    }
-
-    public IStringVal GetTriggerSource()
-    {
-        if (device.Parameters.GetEnumValue("TriggerSource", out var val) != MvError.MV_OK) return null;
-
-        List<string> se = [];
-        foreach (var item in val.SupportEnumEntries)
-        {
-            se.Add(item.Symbolic);
-        }
-        var stringval = new StringValImpl(
-            curEnumEntry: val.CurEnumEntry.Symbolic,
-            supportEnumEntries: se
-        );
-
-        return stringval;
-    }
-
     public void SoftwareTriggerOnce()
     {
-        SetSoftwareTrigger();
+        Parameters.TirggerSoure = "Software";
         device.Parameters.SetCommandValue("TriggerSoftware");
     }
 
@@ -493,6 +422,7 @@ public class HikCamera : ICamera
             //ch: 通知异步处理线程退出 | en: Notify the thread to exit
             _processThreadExit = true;
             _asyncProcessThread.Join();
+            IsConnected = false;
         }
         catch (Exception e)
         {
@@ -501,4 +431,72 @@ public class HikCamera : ICamera
     }
 
     #endregion
+
+    #region 海康相机的IParameters实现类（内部类）
+
+    private class HikParameters(HikCamera hikCamera) : IParameters
+    {
+        public double ExposureTime
+        {
+            get
+            {
+                hikCamera.device.Parameters.GetFloatValue("ExposureTime", out var val);
+                return val?.CurValue ?? 0.0;
+            }
+            set => hikCamera.device.Parameters.SetFloatValue("ExposureTime", (float)value);
+        }
+
+        public double MaxExposureTime
+        {
+            get
+            {
+                hikCamera.device.Parameters.GetFloatValue("ExposureTime", out var val);
+                return val?.Max ?? 0.0;
+            }
+        }
+
+        public double Gain
+        {
+            get
+            {
+                hikCamera.device.Parameters.GetFloatValue("Gain", out var val);
+                return val?.CurValue ?? 0.0;
+            }
+            set => hikCamera.device.Parameters.SetFloatValue("Gain", (float)value);
+        }
+
+        public double MaxGain
+        {
+            get
+            {
+                hikCamera.device.Parameters.GetFloatValue("Gain", out var val);
+                return val?.Max ?? 0.0;
+            }
+        }
+
+        public string TirggerSoure
+        {
+            get
+            {
+                hikCamera.device.Parameters.GetEnumValue("TriggerSource", out var val);
+                return val?.CurEnumEntry.ToString() ?? "";
+            }
+            set
+            {
+                hikCamera.device.Parameters.SetEnumValueByString("TriggerMode", "On");
+                hikCamera.device.Parameters.SetEnumValueByString("TriggerSource", value);
+            }
+        }
+
+        public List<string> TirggerSoures
+        {
+            get
+            {
+                hikCamera.device.Parameters.GetEnumValue("TriggerSource", out var val);
+                return val.SupportEnumEntries.Select(e => e.Symbolic).ToList();
+            }
+        }
+    }
+    #endregion
 }
+

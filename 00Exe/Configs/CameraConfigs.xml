@@ -6,4 +6,10 @@
     <PluginTypeName>HikCameraPlugin.HikCamera</PluginTypeName>
     <PluginAssemblyName>HikCameraPlugin</PluginAssemblyName>
   </CameraConfig>
+  <CameraConfig>
+    <SerialNumber>00G44626044</SerialNumber>
+    <Expain />
+    <PluginTypeName>HikCameraPlugin.HikCamera</PluginTypeName>
+    <PluginAssemblyName>HikCameraPlugin</PluginAssemblyName>
+  </CameraConfig>
 </CameraConfigCollection>

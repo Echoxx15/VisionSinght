@@ -5,17 +5,16 @@ using System.IO;
 using System.Linq;
 using System.Reflection;
 using System.Threading;
-using VisionCore.PluginBase;
 
 namespace HardwareCameraNet;
 
 /// <summary>
-/// 相机管理器
+/// 设备工程类，管理所有相机设备
 /// </summary>
-public sealed class CameraManager
+public sealed class DeviceFactory
 {
     // 单例实例（线程安全）
-    private static readonly Lazy<CameraManager> _instance = new(() => new CameraManager(), LazyThreadSafetyMode.ExecutionAndPublication);
+    private static readonly Lazy<DeviceFactory> _instance = new(() => new DeviceFactory(), LazyThreadSafetyMode.ExecutionAndPublication);
 
     // 2. 线程安全锁（保护配置字典操作）
     private readonly object _lockObj = new();
@@ -25,7 +24,7 @@ public sealed class CameraManager
     /// <summary>
     /// 已添加的相机列表
     /// </summary>
-    private readonly ConcurrentDictionary<string,ICamera> gCameraList = new();
+    private readonly ConcurrentDictionary<string, ICamera> gCameraList = new();
     /// <summary>
     /// 管理已连接的相机列表
     /// </summary>
@@ -41,7 +40,7 @@ public sealed class CameraManager
     /// <summary>
     /// 私有构造函数（禁止外部实例化）
     /// </summary>
-    private CameraManager()
+    private DeviceFactory()
     {
         // 初始化插件加载器（相机插件目录：Plugins/Camera）
         _cameraPluginLoader = new PluginLoader<ICamera>("Plugins/Camera");
@@ -63,22 +62,22 @@ public sealed class CameraManager
     /// <summary>
     /// 全局唯一实例
     /// </summary>
-    public static CameraManager Instance => _instance.Value;
+    public static DeviceFactory Instance => _instance.Value;
 
     /// <summary>
     /// 初始化：加载插件、构建厂商映射、加载本地配置
     /// </summary>
     private void Initialize()
     {
-        // 步骤1：加载相机插件
+        // 加载相机插件
         _cameraPluginLoader.LoadPluginTypes();
         var loadedCameraTypes = _cameraPluginLoader.GetLoadedPluginTypes();
 
-        // 步骤2：构建厂商映射（从插件类型提取厂商特性和枚举方法）
+        // 构建厂商映射（从插件类型提取厂商特性和枚举方法）
         BuildManufacturerMap(loadedCameraTypes.Values);
 
-        // 步骤3：加载本地相机配置（程序启动时恢复用户配置）
-        LoadUserConfigsFromLocal();
+        //// 加载本地相机配置（程序启动时恢复用户配置）
+        //LoadUserConfigsFromLocal();
     }
 
     /// <summary>
@@ -90,15 +89,29 @@ public sealed class CameraManager
 
         foreach (Type type in cameraTypes)
         {
-            // 提取厂商特性（标记插件所属厂商）
-            var manufacturerAttr = type.GetCustomAttribute<CameraManufacturerAttribute>();
-            if (manufacturerAttr == null)
+            if (!typeof(ICamera).IsAssignableFrom(type) || type.IsAbstract || type.IsInterface)
+                continue;
+
+            // 构造一个实例（建议用无参构造或默认参数）
+            ICamera instance = null;
+            try
             {
-                Console.WriteLine($"插件{type.FullName}未标记CameraManufacturerAttribute，跳过");
+                var ctor = type.GetConstructors().FirstOrDefault(c => c.GetParameters().Length == 0);
+                if (ctor != null)
+                    instance = ctor.Invoke(null) as ICamera;
+            }
+            catch
+            {
+                // ignored
+            }
+
+            if (instance == null || string.IsNullOrEmpty(instance.Manufacturer))
+            {
+                Console.WriteLine($"插件{type.FullName}未实现Manufacturer属性或无法实例化，跳过");
                 continue;
             }
 
-            string manufacturerName = manufacturerAttr.ManufacturerName;
+            string manufacturerName = instance.Manufacturer;
             if (ManufacturerMap.ContainsKey(manufacturerName))
             {
                 Console.WriteLine($"厂商{manufacturerName}已存在，跳过重复插件{type.FullName}");
@@ -228,26 +241,26 @@ public sealed class CameraManager
                 return cachedCamera;
             }
 
-            // 1. 检查厂商是否支持
+            //检查厂商是否支持
             if (!ManufacturerMap.TryGetValue(manufacturerName, out var item))
             {
                 Console.WriteLine($"未支持的厂商：{manufacturerName}");
                 return null;
             }
 
-            // 2. 检查设备是否已枚举（可选：避免创建不存在的设备）
+            //检查设备是否已枚举（避免创建不存在的设备）
             var enumeratedDevices = item.EnumerateFunc.Invoke();
             if (!enumeratedDevices.Contains(serialNumber, StringComparer.OrdinalIgnoreCase))
             {
                 Console.WriteLine($"厂商{manufacturerName}下无序列号{serialNumber}的设备");
                 return null;
             }
-            if(temCameraList.TryGetValue(serialNumber, out var cam))
+            if (temCameraList.TryGetValue(serialNumber, out var cam))
             {
                 return cam;
             }
 
-            // 3. 创建实例（用插件类型完全限定名）
+            //创建实例（用插件类型完全限定名）
             var pluginTypeName = item.PluginType.FullName;
             ICamera newCamera = _cameraPluginLoader.CreatePluginInstance(pluginTypeName, serialNumber);
             if (newCamera != null)
@@ -388,4 +401,3 @@ public sealed class CameraManager
         }
     }
 }
-

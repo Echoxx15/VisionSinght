@@ -1,12 +1,11 @@
 ﻿using System.Windows.Forms;
 
-namespace VisionCore.Frm
+namespace VisionCore.Frm;
+
+public partial class Toolbar : UserControl
 {
-    public partial class Toolbar : UserControl
+    public Toolbar()
     {
-        public Toolbar()
-        {
-            InitializeComponent();
-        }
+        InitializeComponent();
     }
 }

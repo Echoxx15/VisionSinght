@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using HardwareCameraNet;
-using HardwareCameraNet.IValue;
 using MVSDK_Net;
 using System.Collections.Concurrent;
 using System.Drawing;
@@ -10,11 +9,11 @@ using System.Linq;
 using System.Runtime.InteropServices;
 using System.Threading;
 using System.Diagnostics;
+using System.Runtime.ConstrainedExecution;
 
 namespace iRAYPLECameraPlugin;
 
-[CameraManufacturer("华睿面阵相机")]
-public class IRAYPLECamera : ICamera
+public class IRAYPLECamera : IDevice2D
 {
 
     #region 相机属性
@@ -37,10 +36,7 @@ public class IRAYPLECamera : ICamera
     #endregion
 
     #region 属性
-    public string PluginId => "iRAYPLE";
-    public Version Version => new Version("1.0.0");
-    public string Description => "华睿面阵相机系列";
-
+    public string Manufacturer => "华睿面阵相机";
     // 图像回调事件（需显式实现事件添加/移除逻辑，确保线程安全）
     private event EventHandler<object> frameGrabedEvent;
     public event EventHandler<object> FrameGrabedEvent
@@ -49,15 +45,19 @@ public class IRAYPLECamera : ICamera
         remove => frameGrabedEvent -= value;
     }
     public event EventHandler<object> DisConnetEvent;
+    
     public string SN { get; }
     public bool IsConnected => device.IMV_IsOpen();
-
+    public IParameters Parameters { get; }
     #endregion
 
     #region 构造函数
+
     public IRAYPLECamera(string sn)
     {
         SN = sn ?? throw new ArgumentNullException(nameof(sn));
+        // 初始化海康相机的参数实现类
+        Parameters = new DahuaParameters(this);
     }
     #endregion
 
@@ -151,59 +151,6 @@ public class IRAYPLECamera : ICamera
             return -1;
         }
     }
-
-    public IFloatVal GetExposureTime()
-    {
-        double val = 0;
-        double max = 0;
-        // 获取属性值
-        if (IMVDefine.IMV_OK != device.IMV_GetDoubleFeatureValue("ExposureTime", ref val)) return null;
-        if (IMVDefine.IMV_OK != device.IMV_GetDoubleFeatureMax("ExposureTime", ref max)) return null;
-        var floatVal = new FloatValImpl(
-            curValue: Convert.ToDouble(val),
-            max: Convert.ToDouble(max),
-            min: Convert.ToDouble(0)
-        );
-
-        return floatVal;
-    }
-
-    public void SetExposureTime(double val)
-    {
-        // 设置属性值
-        device.IMV_SetEnumFeatureSymbol("ExposureAuto", "Off");
-        var ret = device.IMV_SetDoubleFeatureValue("ExposureTime", val);
-        if (IMVDefine.IMV_OK != ret)
-        {
-            Console.WriteLine($"Get feature value failed! ErrorCode[{ret}]");
-        }
-    }
-
-    public IFloatVal GetGain()
-    {
-        double val = 0;
-        double max = 0;
-        // 获取属性值
-        if (IMVDefine.IMV_OK != device.IMV_GetDoubleFeatureValue("GainRaw", ref val)) return null;
-        if (IMVDefine.IMV_OK != device.IMV_GetDoubleFeatureMax("GainRaw", ref max)) return null;
-        var floatVal = new FloatValImpl(
-            curValue: Convert.ToDouble(val),
-            max: Convert.ToDouble(max),
-            min: Convert.ToDouble(0)
-        );
-
-        return floatVal;
-    }
-
-    public void SetGain(double val)
-    {
-        var ret = device.IMV_SetDoubleFeatureValue("GainRaw", val);
-        if (IMVDefine.IMV_OK != ret)
-        {
-            Console.WriteLine($"Get feature value failed! ErrorCode[{ret}]");
-        }
-    }
-
     public void SetSoftwareTrigger()
     {
         // 设置触发源为软触发 
@@ -231,66 +178,6 @@ public class IRAYPLECamera : ICamera
         {
             Console.WriteLine("Set triggerMode value failed! ErrorCode[{0}]", res);
         }
-    }
-
-    public void SetTriggerSource(string triggerSource)
-    {
-        // set TriggerMode On
-        device.IMV_SetEnumFeatureSymbol("TriggerMode", "On");
-        device.IMV_SetEnumFeatureSymbol("TriggerSource", triggerSource);
-    }
-
-    public IStringVal GetTriggerSource()
-    {
-        IMVDefine.IMV_EnumEntryList enumEntryList = new IMVDefine.IMV_EnumEntryList();
-        uint nEntryNum = 0;
-
-        // 获取枚举属性的可设枚举值的个数
-        //  Get the number of enumeration property settable enumeration
-        var res = device.IMV_GetEnumFeatureEntryNum("TriggerSource", ref nEntryNum);
-        if (res != IMVDefine.IMV_OK)
-        {
-            Console.WriteLine("Get settable enumeration number failed! ErrorCode[{0}]", res);
-            return null;
-        }
-
-        enumEntryList.nEnumEntryBufferSize = (uint)Marshal.SizeOf(typeof(IMVDefine.IMV_EnumEntryInfo)) * nEntryNum;
-        enumEntryList.pEnumEntryInfo = Marshal.AllocHGlobal((int)enumEntryList.nEnumEntryBufferSize);
-
-        if (enumEntryList.pEnumEntryInfo == IntPtr.Zero)
-        {
-            Console.WriteLine("pEnumEntryInfo is NULL");
-            return null;
-        }
-
-        // 获取枚举属性的可设枚举值列表
-        // Get enumeration property's settable enumeration value list
-        res = device.IMV_GetEnumFeatureEntrys("TriggerSource", ref enumEntryList);
-        if (res != IMVDefine.IMV_OK)
-        {
-            Console.WriteLine("Get settable enumeration value failed! ErrorCode[{0}]", res);
-            return null;
-        }
-        
-        var se = new List<string>();
-        for (int i = 0; i < nEntryNum; i++)
-        {
-            var t =
-                (IMVDefine.IMV_EnumEntryInfo)
-                Marshal.PtrToStructure(
-                    enumEntryList.pEnumEntryInfo + Marshal.SizeOf(typeof(IMVDefine.IMV_EnumEntryInfo)) * i,
-                    typeof(IMVDefine.IMV_EnumEntryInfo));
-
-            se.Add(t.name);
-        }
-        var cur = new IMVDefine.IMV_String();
-        device.IMV_GetEnumFeatureSymbol("TriggerSource", ref cur);
-        var stringval = new StringValImpl(
-            curEnumEntry: cur.str,
-            supportEnumEntries: se
-        );
-
-        return stringval;
     }
 
     public void SoftwareTriggerOnce()
@@ -632,6 +519,122 @@ public class IRAYPLECamera : ICamera
     /// <param name="len">拷贝数据长度</param>
     [DllImport("Kernel32.dll", EntryPoint = "RtlMoveMemory", CharSet = CharSet.Ansi)]
     private static extern void CopyMemory(IntPtr pDst, IntPtr pSrc, int len);
+
+    #region 海康相机的IParameters实现类（内部类）
+
+    private class DahuaParameters(IRAYPLECamera dahuaCamera) : IParameters
+    {
+        public double ExposureTime
+        {
+            get
+            {
+                double val = 0;
+                dahuaCamera.device.IMV_GetDoubleFeatureValue("ExposureTime", ref val);
+                return val;
+            }
+            set => dahuaCamera.device.IMV_SetDoubleFeatureValue("ExposureTime", value);
+        }
+
+
+        public double MaxExposureTime
+        {
+            get
+            {
+                double val = 0;
+                dahuaCamera.device.IMV_GetDoubleFeatureMax("ExposureTime", ref val);
+                return val;
+            }
+        }
+
+        public double Gain {
+            get
+            {
+                double val = 0;
+                dahuaCamera.device.IMV_GetDoubleFeatureValue("GainRaw", ref val);
+                return val;
+            }
+            set => dahuaCamera.device.IMV_SetDoubleFeatureValue("GainRaw", value);
+        }
+
+        public double MaxGain
+        {
+            get
+            {
+                double val = 0;
+                dahuaCamera.device.IMV_GetDoubleFeatureMax("GainRaw", ref val);
+                return val;
+            }
+        }
+
+        public string TirggerSoure
+        {
+            get
+            {
+                var val = new IMVDefine.IMV_String();
+                dahuaCamera.device.IMV_GetEnumFeatureSymbol("TriggerSource", ref val);
+
+                return val.str;
+            }
+            set
+            {
+                dahuaCamera.device.IMV_SetEnumFeatureSymbol("TriggerMode", "On");
+                dahuaCamera.device.IMV_SetEnumFeatureSymbol("TriggerSource", "Software");
+            }
+        }
+
+        public List<string> TirggerSoures
+        {
+            get
+            {
+                IMVDefine.IMV_EnumEntryList enumEntryList = new IMVDefine.IMV_EnumEntryList();
+                uint nEntryNum = 0;
+
+                // 获取枚举属性的可设枚举值的个数
+                //  Get the number of enumeration property settable enumeration
+                var res = dahuaCamera.device.IMV_GetEnumFeatureEntryNum("TriggerSource", ref nEntryNum);
+                if (res != IMVDefine.IMV_OK)
+                {
+                    Console.WriteLine("Get settable enumeration number failed! ErrorCode[{0}]", res);
+                    return null;
+                }
+
+                enumEntryList.nEnumEntryBufferSize = (uint)Marshal.SizeOf(typeof(IMVDefine.IMV_EnumEntryInfo)) * nEntryNum;
+                enumEntryList.pEnumEntryInfo = Marshal.AllocHGlobal((int)enumEntryList.nEnumEntryBufferSize);
+
+                if (enumEntryList.pEnumEntryInfo == IntPtr.Zero)
+                {
+                    Console.WriteLine("pEnumEntryInfo is NULL");
+                    return [];
+                }
+
+                // 获取枚举属性的可设枚举值列表
+                // Get enumeration property's settable enumeration value list
+                res = dahuaCamera.device.IMV_GetEnumFeatureEntrys("TriggerSource", ref enumEntryList);
+                if (res != IMVDefine.IMV_OK)
+                {
+                    Console.WriteLine("Get settable enumeration value failed! ErrorCode[{0}]", res);
+                    return [];
+                }
+
+                var vals = new List<string>();
+                for (int i = 0; i < nEntryNum; i++)
+                {
+                    var t =
+                        (IMVDefine.IMV_EnumEntryInfo)
+                        Marshal.PtrToStructure(
+                            enumEntryList.pEnumEntryInfo + Marshal.SizeOf(typeof(IMVDefine.IMV_EnumEntryInfo)) * i,
+                            typeof(IMVDefine.IMV_EnumEntryInfo));
+
+                    vals.Add(t.name);
+                }
+
+                return vals;
+            }
+        }
+    }
+    #endregion
+
+
     #endregion
 }
 

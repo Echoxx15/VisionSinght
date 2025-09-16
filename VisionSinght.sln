@@ -22,7 +22,7 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MainForm", "01MainForm\Main
 		{72372FEE-826B-42F8-9B33-1D4A9646DEFC} = {72372FEE-826B-42F8-9B33-1D4A9646DEFC}
 	EndProjectSection
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CameraInterface", "03HardwareCameraNet\CameraInterface\CameraInterface.csproj", "{02D11C38-CC51-4BA5-AC42-C5091B86ABBB}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "HardwareCameraNet", "03HardwareCameraNet\CameraInterface\HardwareCameraNet.csproj", "{02D11C38-CC51-4BA5-AC42-C5091B86ABBB}"
 	ProjectSection(ProjectDependencies) = postProject
 		{C1EC5193-9AE2-486B-A80F-E0CABC76993E} = {C1EC5193-9AE2-486B-A80F-E0CABC76993E}
 	EndProjectSection
@@ -30,6 +30,10 @@ EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "HikCameraPlugin", "03HardwareCameraNet\HikCameraPlugin\HikCameraPlugin.csproj", "{72372FEE-826B-42F8-9B33-1D4A9646DEFC}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "iRAYPLECameraPlugin", "03HardwareCameraNet\iRAYPLECameraPlugin\iRAYPLECameraPlugin.csproj", "{73EC26B7-5E9A-4D72-8369-8A3AAB822AAB}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CameraCapture2D", "02Plugins\CameraCapture2D\CameraCapture2D.csproj", "{D954286D-A6F8-4D27-8B6B-513B7E341CA1}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "图像采集", "图像采集", "{38207CCA-9F14-4A08-BBD3-1ECF69961950}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -61,6 +65,10 @@ Global
 		{73EC26B7-5E9A-4D72-8369-8A3AAB822AAB}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{73EC26B7-5E9A-4D72-8369-8A3AAB822AAB}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{73EC26B7-5E9A-4D72-8369-8A3AAB822AAB}.Release|Any CPU.Build.0 = Release|Any CPU
+		{D954286D-A6F8-4D27-8B6B-513B7E341CA1}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{D954286D-A6F8-4D27-8B6B-513B7E341CA1}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{D954286D-A6F8-4D27-8B6B-513B7E341CA1}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{D954286D-A6F8-4D27-8B6B-513B7E341CA1}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -74,6 +82,8 @@ Global
 		{02D11C38-CC51-4BA5-AC42-C5091B86ABBB} = {7052A41D-7311-4351-BEB3-BABD0ECA81E2}
 		{72372FEE-826B-42F8-9B33-1D4A9646DEFC} = {7052A41D-7311-4351-BEB3-BABD0ECA81E2}
 		{73EC26B7-5E9A-4D72-8369-8A3AAB822AAB} = {7052A41D-7311-4351-BEB3-BABD0ECA81E2}
+		{D954286D-A6F8-4D27-8B6B-513B7E341CA1} = {38207CCA-9F14-4A08-BBD3-1ECF69961950}
+		{38207CCA-9F14-4A08-BBD3-1ECF69961950} = {02EA681E-C7D8-13C7-8484-4AC65E1B71E8}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {1CD0725C-F43F-404E-B58F-4C4BA319D6FB}
